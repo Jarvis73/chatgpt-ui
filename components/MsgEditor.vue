@@ -62,7 +62,13 @@ const clickSendBtn = () => {
 const enterOnly = (event) => {
   event.preventDefault();
   if (!isMobile()) {
-    send()
+    if (event.isComposing) {
+      // 当前正在进行输入法组合输入
+      // 什么也不做
+    } else {
+      send();
+      // 当前没有正在进行输入法组合输入
+    }
   }
 }
 
