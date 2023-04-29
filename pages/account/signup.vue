@@ -96,6 +96,7 @@ const handleFieldUpdate = (field) => {
       style="height: 100vh"
   >
     <v-container>
+      <SettingsLanguages/>
       <v-row>
         <v-col
             sm="9"
@@ -150,14 +151,14 @@ const handleFieldUpdate = (field) => {
                     clearable
                 ></v-text-field>
 
-<!--                <v-text-field-->
-<!--                    v-model="formData.code"-->
-<!--                    :rules="formRules.code"-->
-<!--                    :label="$t('invitation code')"-->
-<!--                    variant="underlined"-->
-<!--                    @keyup.enter="submit"-->
-<!--                    clearable-->
-<!--                ></v-text-field>-->
+               <v-text-field
+                   v-model="formData.code"
+                   :rules="formRules.code"
+                   :label="$t('invitation code')"
+                   variant="underlined"
+                   @keyup.enter="submit"
+                   clearable
+               ></v-text-field>
 
               </v-form>
 
