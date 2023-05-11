@@ -35,6 +35,7 @@
   "setOpenAIApiKey": "设置OpenAI的API密钥",
   "openAIApiKey": "OpenAI的API密钥",
   "getAKey": "获取钥匙",
+  "There is no available API key.": "当前模型不可用.",
   "openAIModels": "OpenAI模型",
   "aboutTheModels": "关于模型",
   "saveAndClose": "保存并关闭",

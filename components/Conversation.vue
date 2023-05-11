@@ -7,7 +7,7 @@ const currentModel = useCurrentModel()
 const openaiApiKey = useApiKey()
 const fetchingResponse = ref(false)
 const messageQueue = []
-const frugalMode = ref(true)
+const frugalMode = ref(false)
 let isProcessingQueue = false
 
 const props = defineProps({
@@ -83,7 +83,12 @@ const fetchReply = async (message) => {
         if (response.ok && response.headers.get('content-type') === EventStreamContentType) {
           return;
         }
-        throw new Error(`Failed to send message. HTTP ${response.status} - ${response.statusText}`);
+        if (response.status == 403) {
+          throw new Error(`${$i18n.t("There is no available API key.")} HTTP ${response.status} - ${response.statusText}`)
+        }
+        else {
+          throw new Error(`Failed to send message. HTTP ${response.status} - ${response.statusText}`);
+        }
       },
       onclose() {
         if (ctrl.signal.aborted === true) {
