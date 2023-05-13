@@ -38,7 +38,7 @@ const contentHtml = ref('')
 const contentElm = ref(null)
 
 watchEffect(async () => {
-  contentHtml.value = props.message.message ? md.render(props.message.message) : ''
+  contentHtml.value = props.message.message ? md.render(props.message.message.replaceAll('\n', '  \n')) : ''
   await nextTick()
   bindCopyCodeToButtons()
 })
