@@ -9,6 +9,23 @@ export const getDefaultConversationData = () => {
     }
 }
 
+export const getDefaultFewShotMessages = () => {
+    return [
+        {
+            role: 'system',
+            content: 'You are a helpful assistant to translate English to Chinese.'
+        },
+        {
+            role: 'user',
+            content: 'I love you.'
+        },
+        {
+            role: 'assistant',
+            content: '我爱你.'
+        }
+    ]
+}
+
 export const getConversations = async () => {
     const { data, error } = await useAuthFetch('/api/chat/conversations/')
     if (!error.value) {

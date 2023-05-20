@@ -74,6 +74,11 @@
   "frugalMode": "Frugal mode",
   "frugalModeTip": "Activate frugal mode, the client will not send historical messages to ChatGPT, which can save token consumption. If you want ChatGPT to understand the context of the conversation, please turn off frugal mode.",
   "settingDraw": "Settings",
+  "presetFewShotMask": "Preset Conversations",
+  "addPresetFewShotMask": "Add preset conversations",
+  "systemPreset": "system preset",
+  "userPreset": "user question",
+  "assistantPreset": "assistant answer",
   "welcomeScreen": {
     "introduction1": "is an unofficial client for ChatGPT, but uses the official OpenAI API.",
     "introduction2": "You will need an OpenAI API Key before you can use this client.",

@@ -9,6 +9,7 @@ const fetchingResponse = ref(false)
 const messageQueue = []
 const frugalMode = ref(false)
 let isProcessingQueue = false
+const fewShotMessages = ref(getDefaultFewShotMessages())
 
 const props = defineProps({
   conversation: {
@@ -61,10 +62,10 @@ const fetchReply = async (message) => {
       default_prompt: $i18n.t('webSearchDefaultPrompt')
     }
   }
-
   const data = Object.assign({}, currentModel.value, {
     openaiApiKey: $settings.open_api_key_setting === 'True' ? openaiApiKey.value : null,
     message: message,
+    fewShotMask: fewShotMessages.value,
     conversationId: props.conversation.id,
     frugalMode: frugalMode.value
   }, webSearchParams)
@@ -255,6 +256,7 @@ onNuxtReady(() => {
           color="transparent"
       >
         <Prompt v-show="!fetchingResponse" :use-prompt="usePrompt" />
+        <FewShotMask v-show="!fetchingResponse" :few-shot-messages="fewShotMessages" />
         <v-switch
             v-if="$settings.open_web_search === 'True'"
             v-model="enableWebSearch"
