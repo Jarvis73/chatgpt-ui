@@ -10,20 +10,7 @@ export const getDefaultConversationData = () => {
 }
 
 export const getDefaultFewShotMessages = () => {
-    return [
-        {
-            role: 'system',
-            content: 'You are a helpful assistant to translate English to Chinese.'
-        },
-        {
-            role: 'user',
-            content: 'I love you.'
-        },
-        {
-            role: 'assistant',
-            content: '我爱你.'
-        }
-    ]
+    return []
 }
 
 export const getConversations = async () => {

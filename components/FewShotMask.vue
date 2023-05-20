@@ -2,6 +2,7 @@
 const { $i18n } = useNuxtApp()
 
 const menu = ref(false)
+const grab = ref(null)
 const props = defineProps({
   fewShotMessages: {
     type: Array,
@@ -14,15 +15,19 @@ const addPrompt = () => {
     role: 'user',
     content: ''
   }
+  if (props.fewShotMessages.length === 0) {
+    fewShotMessage.role = 'system'
+    fewShotMessage.content = 'You are a helpful assistant.'
+  }
+  else if (props.fewShotMessages.length % 2 === 0) {
+    fewShotMessage.role = 'assistant'
+  }
   props.fewShotMessages.push(fewShotMessage)
-}
-
-const getTips = (boxType) => {
-  return $i18n.t('addANew') + $i18n.t(`${boxType}Preset`)
-}
-
-const getFocusTips = (boxType) => {
-  return $i18n.t(boxType)
+  // Here we use nextTink() before calling scrollIntoView because
+  // we need the `fewShotMessages,push` operation reflected in the DOM.
+  nextTick(() => {
+    grab.value.scrollIntoView({behavior: 'smooth', block: 'end'})
+  })
 }
 </script>
 
@@ -32,7 +37,9 @@ const getFocusTips = (boxType) => {
       <template v-slot:activator="{ props }">
         <v-btn v-bind="props" icon>
           <v-icon 
-            :icon="fewShotMessages.length === 0 ? 'face' : 'face_retouching_natural'"
+            :icon="fewShotMessages.length === 0 ? 'face' : 'fa:fa-solid fa-mask '"
+            style="padding-bottom: 2px;"
+            fade
           ></v-icon>
         </v-btn>
       </template>
@@ -48,7 +55,7 @@ const getFocusTips = (boxType) => {
 
           <v-divider></v-divider>
 
-          <v-list>
+          <v-list class="list-max-height">
             <template
               v-for="(fewShotMessage, idx) in props.fewShotMessages"
               :key="fewShotMessage.id"
@@ -125,17 +132,17 @@ const getFocusTips = (boxType) => {
                 </v-row>
               </div>
             </template> 
-            <v-list-item>
-              <v-btn
-                variant="text"
-                block
-                @click="addPrompt()"
-              >
-                <v-icon icon="add_circle_outline"></v-icon>
-                {{ $t('addPresetFewShotMask') }}
-              </v-btn>
-            </v-list-item>
+            <div ref="grab" class="w-100" style="height: 5px;"></div>
           </v-list>
+          <v-btn
+            variant="text"
+            block
+            @click="addPrompt()"
+            class="botton-button"
+          >
+            <v-icon icon="add_circle_outline"></v-icon>
+            {{ $t('addPresetFewShotMask') }}
+          </v-btn>
         </v-card>
       </v-container>
     </v-menu>
@@ -143,17 +150,21 @@ const getFocusTips = (boxType) => {
 </template>
 
 <style scoped>
+.list-max-height {
+  max-height: 350px;
+  overflow: auto;
+}
 .square {  
   height: 100% !important;  
   border-radius: 5px !important;
-}
-.primary-btn {  
-  background-color: rgb(199, 199, 199);  
-  /* color: white;   */
 }
 .btn-group {
   padding: 0 9px;
   margin-bottom: -15px;
   border-radius: 0 !important;
+}
+.botton-button {
+  margin: 5px !important;
+  min-height: 40px;
 }
 </style>
