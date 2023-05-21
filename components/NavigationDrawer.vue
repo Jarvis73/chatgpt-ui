@@ -1,6 +1,7 @@
 <script setup>
 import { useDisplay } from 'vuetify'
 import { useDrawer } from "../composables/states";
+import { useTheme } from 'vuetify'
 
 const route = useRoute()
 const { $i18n, $settings } = useNuxtApp()
@@ -18,6 +19,7 @@ const themes = ref([
 ])
 const setTheme = (theme) => {
   colorMode.preference = theme
+  // useTheme().global.name.value = useColorMode().value
 }
 const feedback = () => {
   window.open('https://github.com/Jarvis73/chatgpt-ui/issues', '_blank')

@@ -9,11 +9,27 @@ const fetchingResponse = ref(false)
 const messageQueue = []
 const frugalMode = ref(false)
 let isProcessingQueue = false
-const fewShotMessages = ref(getDefaultFewShotMessages())
+const grab = ref(null)
 
 const props = defineProps({
   conversation: {
     type: Object,
+    required: true
+  },
+  openMaskStore: {
+    type: Function,
+    required: true
+  },
+  conversationPanel: {
+    type: Boolean,
+    required: true
+  },
+  fewShotMessages: {
+    type: Array,
+    required: true
+  },
+  maskTitle: {
+    type: Array,
     required: true
   }
 })
@@ -138,7 +154,6 @@ const fetchReply = async (message) => {
   }
 }
 
-const grab = ref(null)
 const scrollChatWindow = () => {
   if (grab.value === null) {
     return;
@@ -171,12 +186,16 @@ const usePrompt = (prompt) => {
   editor.value.usePrompt(prompt)
 }
 
+const useMask = (title, mask) => {
+  maskTitle.value = title
+  fewShotMessages.value = mask
+}
+
 const deleteMessage = (index) => {
   props.conversation.messages.splice(index, 1)
 }
 
 const enableWebSearch = ref(false)
-
 
 onNuxtReady(() => {
   currentModel.value = getCurrentModel()
@@ -185,6 +204,7 @@ onNuxtReady(() => {
 </script>
 
 <template>
+  <div v-show="props.conversationPanel">
   <div v-if="conversation">
     <div
         v-if="conversation.loadingMessages"
@@ -234,29 +254,28 @@ onNuxtReady(() => {
       </div>
     </div>
   </div>
+  </div>
 
 
-  <v-footer
-      app
-      class="footer"
-  >
+  <v-footer app v-show="props.conversationPanel">
     <div class="px-md-16 w-100 d-flex flex-column">
-      <div class="d-flex align-center">
-        <v-btn
-            v-show="fetchingResponse"
-            icon="close"
-            title="stop"
-            class="mr-3"
-            @click="stop"
-        ></v-btn>
-        <MsgEditor ref="editor" :send-message="send" :disabled="fetchingResponse" :loading="fetchingResponse" />
-      </div>
       <v-toolbar
           density="comfortable"
           color="transparent"
       >
         <Prompt v-show="!fetchingResponse" :use-prompt="usePrompt" />
-        <FewShotMask v-show="!fetchingResponse" :few-shot-messages="fewShotMessages" />
+        <FewShotMask 
+          v-show="!fetchingResponse" 
+          :few-shot-messages="fewShotMessages" 
+          :mask-title="maskTitle"
+        />
+        <v-btn icon @click="openMaskStore()" v-show="!fetchingResponse" >
+          <v-icon 
+            icon="fa:fa-solid fa-store" 
+            size="20" 
+            style="padding-bottom: 2px;"
+          />
+        </v-btn>
         <v-switch
             v-if="$settings.open_web_search === 'True'"
             v-model="enableWebSearch"
@@ -304,6 +323,17 @@ onNuxtReady(() => {
         </div>
 
       </v-toolbar>
+      <div class="d-flex align-center">
+        <v-btn
+            v-show="fetchingResponse"
+            icon="close"
+            title="stop"
+            class="mr-3"
+            @click="stop"
+        ></v-btn>
+        <MsgEditor ref="editor" :send-message="send" :disabled="fetchingResponse" :loading="fetchingResponse" />
+      </div>
+
     </div>
   </v-footer>
   <v-snackbar
@@ -323,11 +353,15 @@ onNuxtReady(() => {
       </v-btn>
     </template>
   </v-snackbar>
-
 </template>
 
 <style scoped>
-  .footer {
-    width: 100%;
-  }
+.container {
+  padding: 0;
+  margin: 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
 </style>

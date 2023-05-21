@@ -3,14 +3,19 @@ const { $i18n } = useNuxtApp()
 
 const menu = ref(false)
 const grab = ref(null)
+// const showTitle = ref(false)
 const props = defineProps({
+  maskTitle: {
+    type: Array,
+    required: true
+  },
   fewShotMessages: {
     type: Array,
     required: true
   }
 })
 
-const addPrompt = () => {
+const addMessage = () => {
   const fewShotMessage = {
     role: 'user',
     content: ''
@@ -18,6 +23,7 @@ const addPrompt = () => {
   if (props.fewShotMessages.length === 0) {
     fewShotMessage.role = 'system'
     fewShotMessage.content = 'You are a helpful assistant.'
+    // showTitle.value = true
   }
   else if (props.fewShotMessages.length % 2 === 0) {
     fewShotMessage.role = 'assistant'
@@ -29,6 +35,35 @@ const addPrompt = () => {
     grab.value.scrollIntoView({behavior: 'smooth', block: 'end'})
   })
 }
+
+const deleteFewShotMasks = (idx) => {
+  props.fewShotMessages.splice(idx, 1)
+  // if (props.fewShotMessages.length === 0) {
+    // showTitle.value = false
+  // }
+}
+
+const resetFewShotMasks = () => {
+  props.fewShotMessages.length = 0
+  // showTitle.value = false
+}
+
+const submittingNewMask = ref(false)
+const saveFewShotMasks = async () => {
+  if (props.fewShotMessages.length === 0) {
+    return
+  }
+  submittingNewMask.value = true
+  const { data, error } = await useAuthFetch('/api/chat/masks/', {
+    method: 'POST',
+    body: {
+      title: maskTitle.value[0],
+      mask: JSON.stringify(fewShotMessages)
+    }
+  })
+  submittingNewMask.value = false
+}
+
 </script>
 
 <template>
@@ -37,7 +72,7 @@ const addPrompt = () => {
       <template v-slot:activator="{ props }">
         <v-btn v-bind="props" icon>
           <v-icon 
-            :icon="fewShotMessages.length === 0 ? 'face' : 'fa:fa-solid fa-mask '"
+            :icon="fewShotMessages.length === 0 ? 'face' : 'fa:fa-solid fa-mask'"
             style="padding-bottom: 2px;"
             fade
           ></v-icon>
@@ -48,6 +83,7 @@ const addPrompt = () => {
         <v-card 
             min-width="800" 
             max-width="1000"
+            class="card-custom"
           >
           <v-card-title>
             <span class="headline">{{ $t('presetFewShotMask') }}</span>
@@ -56,8 +92,20 @@ const addPrompt = () => {
           <v-divider></v-divider>
 
           <v-list class="list-max-height">
+            <div 
+              v-if="fewShotMessages.length > 0"
+              class="pt-3 pl-6 pr-6 mask-title-custom"
+            >
+              <h3 style="margin: 0 20px 20px 0;">名称</h3>
+              <v-text-field
+                v-model="maskTitle[0]"
+                density="compact"
+                variant="outlined"
+              ></v-text-field>
+              <v-spacer></v-spacer>
+            </div>
             <template
-              v-for="(fewShotMessage, idx) in props.fewShotMessages"
+              v-for="(fewShotMessage, idx) in fewShotMessages"
               :key="fewShotMessage.id"
             >
               <div class="pt-3 pl-6 pr-6">
@@ -112,6 +160,7 @@ const addPrompt = () => {
                       :label="$t(`${fewShotMessage.role}Preset`)"
                       variant="outlined"
                       density="compact"
+                      :tabindex="idx + 1"
                       hide-details
                     >
                     </v-textarea>
@@ -121,7 +170,7 @@ const addPrompt = () => {
                     <v-btn
                       block
                       title="delete"
-                      @click="fewShotMessages.splice(idx, 1)"
+                      @click="deleteFewShotMasks(idx)"
                       class="square"
                       color="transparent"  
                       elevation="0"
@@ -134,15 +183,35 @@ const addPrompt = () => {
             </template> 
             <div ref="grab" class="w-100" style="height: 5px;"></div>
           </v-list>
-          <v-btn
-            variant="text"
-            block
-            @click="addPrompt()"
-            class="botton-button"
-          >
-            <v-icon icon="add_circle_outline"></v-icon>
-            {{ $t('addPresetFewShotMask') }}
-          </v-btn>
+          <v-divider v-show="props.fewShotMessages.length > 0" ></v-divider>
+          <div class="action-custom">
+            <v-btn 
+              variant="outlined"
+              class="action-btn-custom"
+              :loading="submittingNewMask"
+              @click="saveFewShotMasks()"
+            >
+              <v-icon icon="save"></v-icon>
+              <span style="padding-left: 2px;">保存</span>
+            </v-btn>
+            <v-btn
+              variant="outlined"
+              @click="addMessage()"
+              class="action-btn-custom"
+            >
+              <v-icon icon="add_circle_outline"></v-icon>
+              <span style="padding-left: 2px;">{{ $t('addPresetFewShotMask') }}</span>
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn 
+              variant="outlined"
+              class="action-btn-custom"
+              @click="resetFewShotMasks()"
+            >
+              <v-icon icon="refresh"></v-icon>
+              <span style="padding-left: 2px;">重置</span>
+            </v-btn>
+          </div>
         </v-card>
       </v-container>
     </v-menu>
@@ -150,11 +219,20 @@ const addPrompt = () => {
 </template>
 
 <style scoped>
+.card-custom {
+  display: flex;
+  flex-direction: column;
+}
 .list-max-height {
   max-height: 350px;
   overflow: auto;
+  padding: 0 0 5px 0;
 }
-.square {  
+.mask-title-custom {
+  display: flex;
+  align-items: center;
+}
+.square {
   height: 100% !important;  
   border-radius: 5px !important;
 }
@@ -163,8 +241,16 @@ const addPrompt = () => {
   margin-bottom: -15px;
   border-radius: 0 !important;
 }
-.botton-button {
+.bottom-button {
   margin: 5px !important;
   min-height: 40px;
+}
+.action-custom {
+  display: flex;
+  flex-direction: row-reverse;
+  margin: 10px 10px;
+}
+.action-btn-custom {
+  margin: 0 10px;
 }
 </style>

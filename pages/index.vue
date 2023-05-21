@@ -1,4 +1,5 @@
 <script setup>
+
 definePageMeta({
   middleware: ["auth"],
   path: '/:id?',
@@ -10,6 +11,24 @@ const runtimeConfig = useRuntimeConfig()
 const drawer = useDrawer()
 const route = useRoute()
 const conversation = ref(getDefaultConversationData())
+const maskStore = ref(false)
+const appBar = ref(true)
+const conversationPanel = ref(true)
+const fewShotMessages = ref(getDefaultFewShotMessages())
+const maskTitle = ref(['新的角色扮演'])
+const totalMasks = ref(0)
+
+const openMaskStore = () => {
+  maskStore.value = true
+  appBar.value = false
+  conversationPanel.value = false
+}
+
+const closeMaskStore = () => {
+  maskStore.value = false
+  appBar.value = true
+  conversationPanel.value = true
+}
 
 const loadConversation = async () => {
   const { data, error } = await useAuthFetch('/api/chat/conversations/' + route.params.id)
@@ -35,6 +54,15 @@ const createNewConversation = () => {
   })
 }
 
+const useMask = (title, mask) => {
+  maskTitle.value[0] = title
+  fewShotMessages.value = mask
+  closeMaskStore()
+}
+
+const updateMaskNumber = (value) => {
+  totalMasks.value = value
+}
 
 onMounted(async () => {
   if (route.params.id) {
@@ -63,30 +91,89 @@ onActivated(async () => {
 
 <template>
   <v-app-bar>
-    <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+    <v-app-bar-nav-icon v-if="appBar" @click="drawer = !drawer">
+    </v-app-bar-nav-icon>
+    <v-btn icon="fa:fa-solid fa-store" title="store" v-if="maskStore" style="pointer-events: none;" >
+    </v-btn>
 
-    <v-toolbar-title>{{ navTitle }}</v-toolbar-title>
+    <v-toolbar-title>
+      {{ maskStore ? '角色扮演商店' : navTitle }}
+      <div 
+        v-if="maskStore"
+        class="v-subtitle"
+      >共 {{ totalMasks }} 个面具</div>
+    </v-toolbar-title>
 
     <v-spacer></v-spacer>
 
+    <!-- appBar buttons -->
     <v-btn
-        :title="$t('newConversation')"
-        icon="add"
-        @click="createNewConversation"
-        class="d-md-none"
+      v-if="appBar"  
+      :title="$t('newConversation')"
+      icon="add"
+      @click="createNewConversation"
+      class="d-md-none"
     ></v-btn>
     <v-btn
-        variant="outlined"
-        class="text-none d-none d-md-block"
-        @click="createNewConversation"
+      v-if="appBar"
+      variant="outlined"
+      class="text-none d-none d-md-block"
+      @click="createNewConversation"
     >
       {{ $t('newConversation') }}
     </v-btn>
 
+    <!-- maskStore buttons -->
+    <v-btn 
+      v-if="maskStore"
+      icon="fa:fa-solid fa-upload">
+    </v-btn>
+    <v-btn 
+      v-if="maskStore"
+      icon="fa:fa-solid fa-download">
+    </v-btn>
+    <v-btn 
+      v-if="maskStore"
+      icon="fa:fa-solid fa-xmark"
+      @click="closeMaskStore()"
+    >
+    </v-btn>
+
   </v-app-bar>
 
-  <v-main>
-    <Welcome v-if="!route.params.id && conversation.messages.length === 0" />
-    <Conversation :conversation="conversation" />
+  <v-main class="main-custom">
+    <Welcome v-if="!route.params.id && conversation.messages.length === 0 && !maskStore" />
+    <transition name="slide-up">
+      <MaskStore 
+        v-if="maskStore"
+        :use-mask="useMask"
+        :update-mask-number="updateMaskNumber"
+      />
+    </transition>
+    <Conversation 
+      :conversation="conversation"
+      :open-mask-store="openMaskStore" 
+      :conversation-panel="conversationPanel"
+      :few-shot-messages="fewShotMessages"
+      :mask-title="maskTitle"
+    />
   </v-main>
 </template>
+
+<style scoped>
+.main-custom {
+  display: flex;
+}
+.v-subtitle {  
+  font-size: 0.8em;
+  font-weight: 400;
+  margin-top: -4px;
+}
+@keyframes axisY {
+  from { transform: translateY(5%); }
+  to { transform: translateY(0px); }
+}
+.slide-up-enter-active {
+  animation: axisY 0.3s;
+}
+</style>
