@@ -3,13 +3,16 @@ const { $i18n } = useNuxtApp()
 
 const menu = ref(false)
 const grab = ref(null)
-// const showTitle = ref(false)
 const props = defineProps({
   maskTitle: {
     type: Array,
     required: true
   },
   fewShotMessages: {
+    type: Array,
+    required: true
+  },
+  showButtonGroup: {
     type: Array,
     required: true
   }
@@ -28,6 +31,7 @@ const addMessage = () => {
   else if (props.fewShotMessages.length % 2 === 0) {
     fewShotMessage.role = 'assistant'
   }
+  props.showButtonGroup.push(true)
   props.fewShotMessages.push(fewShotMessage)
   // Here we use nextTink() before calling scrollIntoView because
   // we need the `fewShotMessages,push` operation reflected in the DOM.
@@ -37,15 +41,13 @@ const addMessage = () => {
 }
 
 const deleteFewShotMasks = (idx) => {
+  props.showButtonGroup.splice(idx, 1)
   props.fewShotMessages.splice(idx, 1)
-  // if (props.fewShotMessages.length === 0) {
-    // showTitle.value = false
-  // }
 }
 
 const resetFewShotMasks = () => {
+  props.showButtonGroup.length = 0
   props.fewShotMessages.length = 0
-  // showTitle.value = false
 }
 
 const submittingNewMask = ref(false)
@@ -57,11 +59,24 @@ const saveFewShotMasks = async () => {
   const { data, error } = await useAuthFetch('/api/chat/masks/', {
     method: 'POST',
     body: {
-      title: maskTitle.value[0],
-      mask: JSON.stringify(fewShotMessages)
+      title: props.maskTitle[0],
+      mask: JSON.stringify(props.fewShotMessages)
     }
   })
   submittingNewMask.value = false
+  menu.value = false
+}
+
+const adjustTextAreaHeightWhenFocus = (event, idx) => {
+  props.showButtonGroup[idx] = false
+  const textarea = event.target;
+  textarea.rows = 5;
+}
+
+const adjustTextAreaHeightWhenBlur = (event, idx) => {
+  props.showButtonGroup[idx] = true
+  const textarea = event.target;
+  textarea.rows = 1;
 }
 
 </script>
@@ -82,7 +97,7 @@ const saveFewShotMasks = async () => {
       <v-container>
         <v-card 
             min-width="800" 
-            max-width="1000"
+            max-width="800"
             class="card-custom"
           >
           <v-card-title>
@@ -108,77 +123,67 @@ const saveFewShotMasks = async () => {
               v-for="(fewShotMessage, idx) in fewShotMessages"
               :key="fewShotMessage.id"
             >
-              <div class="pt-3 pl-6 pr-6">
-                <v-row justify="center">
-                  <v-col cols="2">
-                    <v-btn-group 
-                      v-model="fewShotMessage.role"
-                      density="compact"
-                      class="btn-group"
-                    > 
-                      <v-row>
-                        <v-col cols="4" class="d-flex justify-center">
-                          <v-btn 
-                            block 
-                            title="system" 
-                            @click="fewShotMessage.role='system'" 
-                            class="square"
-                            :color="fewShotMessage.role == 'system' ? 'primary' : ''"
-                          >
-                            <v-icon icon="settings" size="24"></v-icon>
-                          </v-btn>
-                        </v-col>
-                        <v-col cols="4" class="d-flex justify-center">
-                          <v-btn 
-                            block 
-                            title="user" 
-                            @click="fewShotMessage.role='user'"
-                            class="square"
-                            :color="fewShotMessage.role === 'user' ? 'primary' : ''"
-                          >
-                            <v-icon icon="person" size="24"></v-icon>
-                          </v-btn>
-                        </v-col>
-                        <v-col cols="4" class="d-flex justify-center">
-                          <v-btn 
-                            block 
-                            title="assistant" 
-                            @click="fewShotMessage.role='assistant'"  
-                            class="square"
-                            :color="fewShotMessage.role === 'assistant' ? 'primary' : ''"
-                          >
-                            <v-icon icon="smart_toy" size="24"></v-icon></v-btn>
-                        </v-col>
-                      </v-row>
-                    </v-btn-group> 
-                  </v-col>
+              <div class="pt-3 pl-6 pr-6 list-item-custom">
+                <v-btn-group 
+                  v-if="showButtonGroup[idx]"
+                  v-model="fewShotMessage.role"
+                  density="compact"
+                  class="btn-group"
+                > 
+                  <v-btn 
+                    icon 
+                    title="system" 
+                    @click="fewShotMessage.role='system'" 
+                    class="square"
+                    :color="fewShotMessage.role == 'system' ? 'primary' : ''"
+                  >
+                    <v-icon icon="settings" size="24"></v-icon>
+                  </v-btn>
+                  <v-btn 
+                    icon 
+                    title="user" 
+                    @click="fewShotMessage.role='user'"
+                    class="square"
+                    :color="fewShotMessage.role === 'user' ? 'primary' : ''"
+                  >
+                    <v-icon icon="person" size="24"></v-icon>
+                  </v-btn>
+                  <v-btn 
+                    icon 
+                    title="assistant" 
+                    @click="fewShotMessage.role='assistant'"  
+                    class="square"
+                    :color="fewShotMessage.role === 'assistant' ? 'primary' : ''"
+                  >
+                    <v-icon icon="smart_toy" size="24"></v-icon>
+                  </v-btn>
+                </v-btn-group> 
 
-                  <v-col cols="9">
-                    <v-textarea 
-                      rows="1"
-                      v-model="fewShotMessage.content"
-                      :label="$t(`${fewShotMessage.role}Preset`)"
-                      variant="outlined"
-                      density="compact"
-                      :tabindex="idx + 1"
-                      hide-details
-                    >
-                    </v-textarea>
-                  </v-col>
+                <v-textarea 
+                  rows="1"
+                  v-model="fewShotMessage.content"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  class="textarea-custom"
+                  :label="$t(`${fewShotMessage.role}Preset`)"
+                  :tabindex="idx + 1"
+                  v-on:focus="adjustTextAreaHeightWhenFocus($event, idx)"
+                  v-on:blur="adjustTextAreaHeightWhenBlur($event, idx)"
+                >
+                </v-textarea>
 
-                  <v-col cols="1">
-                    <v-btn
-                      block
-                      title="delete"
-                      @click="deleteFewShotMasks(idx)"
-                      class="square"
-                      color="transparent"  
-                      elevation="0"
-                    >
-                      <v-icon icon="highlight_remove" size="24"></v-icon>
-                    </v-btn>
-                  </v-col>
-                </v-row>
+                <v-btn
+                  icon
+                  title="delete"
+                  v-if="showButtonGroup[idx]"
+                  @click="deleteFewShotMasks(idx)"
+                  class="square"
+                  color="transparent"  
+                  elevation="0"
+                >
+                  <v-icon icon="highlight_remove" size="24"></v-icon>
+                </v-btn>
               </div>
             </template> 
             <div ref="grab" class="w-100" style="height: 5px;"></div>
@@ -224,7 +229,7 @@ const saveFewShotMasks = async () => {
   flex-direction: column;
 }
 .list-max-height {
-  max-height: 350px;
+  max-height: 400px;
   overflow: auto;
   padding: 0 0 5px 0;
 }
@@ -233,13 +238,20 @@ const saveFewShotMasks = async () => {
   align-items: center;
 }
 .square {
-  height: 100% !important;  
+  /* height: 100% !important;  
+  border-radius: 5px !important; */
+  padding: 5px;
+  margin: 0 5px;
   border-radius: 5px !important;
 }
 .btn-group {
-  padding: 0 9px;
+  /* padding: 0 9px;
   margin-bottom: -15px;
+  border-radius: 0 !important; */
+  padding: 0 10px 0 0px;
   border-radius: 0 !important;
+  display: flex;
+  align-items: center;
 }
 .bottom-button {
   margin: 5px !important;
@@ -252,5 +264,13 @@ const saveFewShotMasks = async () => {
 }
 .action-btn-custom {
   margin: 0 10px;
+}
+.list-item-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.textarea-custom {
+  flex-grow: 1;
 }
 </style>

@@ -31,6 +31,10 @@ const props = defineProps({
   maskTitle: {
     type: Array,
     required: true
+  },
+  showButtonGroup: {
+    type: Array,
+    required: true
   }
 })
 
@@ -268,6 +272,7 @@ onNuxtReady(() => {
           v-show="!fetchingResponse" 
           :few-shot-messages="fewShotMessages" 
           :mask-title="maskTitle"
+          :show-button-group="showButtonGroup"
         />
         <v-btn icon @click="openMaskStore()" v-show="!fetchingResponse" >
           <v-icon 

@@ -15,6 +15,7 @@ const maskStore = ref(false)
 const appBar = ref(true)
 const conversationPanel = ref(true)
 const fewShotMessages = ref(getDefaultFewShotMessages())
+const showButtonGroup = ref([])
 const maskTitle = ref(['新的角色扮演'])
 const totalMasks = ref(0)
 
@@ -56,6 +57,9 @@ const createNewConversation = () => {
 
 const useMask = (title, mask) => {
   maskTitle.value[0] = title
+  for (var i = 0; i < mask.length; i ++) {
+    showButtonGroup.value.push(true)
+  }
   fewShotMessages.value = mask
   closeMaskStore()
 }
@@ -124,14 +128,14 @@ onActivated(async () => {
     </v-btn>
 
     <!-- maskStore buttons -->
-    <v-btn 
+    <!-- <v-btn 
       v-if="maskStore"
       icon="fa:fa-solid fa-upload">
     </v-btn>
     <v-btn 
       v-if="maskStore"
       icon="fa:fa-solid fa-download">
-    </v-btn>
+    </v-btn> -->
     <v-btn 
       v-if="maskStore"
       icon="fa:fa-solid fa-xmark"
@@ -155,6 +159,7 @@ onActivated(async () => {
       :open-mask-store="openMaskStore" 
       :conversation-panel="conversationPanel"
       :few-shot-messages="fewShotMessages"
+      :show-button-group="showButtonGroup"
       :mask-title="maskTitle"
     />
   </v-main>
