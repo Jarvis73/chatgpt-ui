@@ -29,6 +29,7 @@
     "markdown-it-mathjax3": "^4.3.2",
     "nanoid": "^4.0.1",
     "vue-awesome": "^4.5.0",
+    "vue3-emoji-picker": "^1.1.7",
     "vuetify": "^3.0.6",
     "yarn": "^1.22.19"
   },

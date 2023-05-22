@@ -16,7 +16,7 @@ const appBar = ref(true)
 const conversationPanel = ref(true)
 const fewShotMessages = ref(getDefaultFewShotMessages())
 const showButtonGroup = ref([])
-const maskTitle = ref(['新的角色扮演'])
+const maskTitle = ref([$i18n.t('newCosplay'), '😀'])
 const totalMasks = ref(0)
 
 const openMaskStore = () => {
@@ -55,8 +55,9 @@ const createNewConversation = () => {
   })
 }
 
-const useMask = (title, mask) => {
+const useMask = (title, avator, mask) => {
   maskTitle.value[0] = title
+  maskTitle.value[1] = avator
   for (var i = 0; i < mask.length; i ++) {
     showButtonGroup.value.push(true)
   }
@@ -101,11 +102,11 @@ onActivated(async () => {
     </v-btn>
 
     <v-toolbar-title>
-      {{ maskStore ? '角色扮演商店' : navTitle }}
+      {{ maskStore ? $t('cosplayStore') : navTitle }}
       <div 
         v-if="maskStore"
         class="v-subtitle"
-      >共 {{ totalMasks }} 个面具</div>
+      >{{ $t('masksTotal1') + totalMasks + $t('masksTotal2') }}</div>
     </v-toolbar-title>
 
     <v-spacer></v-spacer>

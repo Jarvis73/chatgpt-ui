@@ -25,6 +25,7 @@ const loadFewShotMasks = async () => {
     for (var i = 0; i < data.value.length; i++) {
       fewShotMasks.value.push({
         title: data.value[i].title,
+        avatar: data.value[i].avatar,
         mask: JSON.parse(data.value[i].mask),
         id: data.value[i].id
       })
@@ -93,21 +94,21 @@ onNuxtReady( () => {
           <v-list-item class="list-item-custom">
             <div class="list-item-content-custom">
               <div class="left-side-custom">
-                <v-icon icon="catching_pokemon" class="icon-custom"></v-icon>
+                <v-icon class="icon-custom">{{ item.avatar }}</v-icon>
                 <div>
                   <v-list-item-title>{{ item.title }}</v-list-item-title>
-                  <v-list-item-subtitle>{{ `包含${item.mask.length}条对话` }}</v-list-item-subtitle>
+                  <v-list-item-subtitle>{{ `${$t('contain')} ${item.mask.length} ${$t('conversation')}` }}</v-list-item-subtitle>
                 </div>
               </div>
               <div class="right-side-custom">
                 <v-btn 
                   color=""
                   variant="outlined"
-                  @click="useMask(item.title, item.mask)"
+                  @click="useMask(item.title, item.avatar, item.mask)"
                   class="btn-custom"
                 >
                   <v-icon icon="add"></v-icon>
-                  <span style="padding-left: 1px;">使用</span>
+                  <span class="pl-1">{{ $t('use') }}</span>
                 </v-btn>
                 <v-btn 
                   color=""
@@ -116,7 +117,7 @@ onNuxtReady( () => {
                   @click="onViewMask(idx)"
                 >
                   <v-icon icon="remove_red_eye"></v-icon>
-                  <span style="padding-left: 2px;">查看</span>
+                  <span class="pl-1">{{ $t('view') }}</span>
                 </v-btn>
                 <v-btn 
                   color=""
@@ -125,7 +126,7 @@ onNuxtReady( () => {
                   @click="onDeleteMask(idx)"
                 >
                   <v-icon icon="delete"></v-icon>
-                  <span style="padding-left: 2px;">删除</span>
+                  <span class="pl-1">{{ $t('delete') }}</span>
                 </v-btn>
               </div>
             </div>
@@ -137,8 +138,8 @@ onNuxtReady( () => {
     <!-- Confirm Delete Dialog -->
     <v-dialog v-model="showDeleteDialog" max-width="500px">
       <v-card>
-        <v-card-title class="headline">确认删除</v-card-title>
-        <v-card-text>确定要删除吗?</v-card-text>
+        <v-card-title class="headline">{{ $t('Confirm deletion') }}</v-card-title>
+        <v-card-text>{{ $t('confirmDeleteMask') }}</v-card-text>
         <v-card-actions style="display: flex; flex-direction: row-reverse;">
           <v-btn 
             text 
@@ -146,7 +147,7 @@ onNuxtReady( () => {
             @click="deleteFewShotMask()"
             class="btn-custom"
           >
-            删除
+            {{ $t('delete') }}
           </v-btn>
           <v-btn 
             text
@@ -154,7 +155,7 @@ onNuxtReady( () => {
             @click="showDeleteDialog = false"
             class="btn-custom"
           >
-            取消
+            {{ $t('Cancel') }}
           </v-btn>
           </v-card-actions>
       </v-card>
@@ -168,19 +169,27 @@ onNuxtReady( () => {
         class="card-custom"
       >
         <v-card-title>
-          <span class="headline">{{ '查看角色扮演' }}</span>
+          <span class="headline">{{ $t('viewCosplay') }}</span>
         </v-card-title>
 
         <v-divider></v-divider>
 
         <v-list class="list-max-height">
-          <div class="pt-3 pl-6 pr-6 mask-title-custom">
-            <h3 style="margin: 0 20px 20px 0;">名称</h3>
+          <div class="pt-3 pl-7 pr-6 mask-title-custom">
+            <h3 style="margin: 0 20px 20px 0;">{{ $t('maskTitle') }}</h3>
+            <v-btn 
+              icon 
+              variant="outlined"
+              class="avatar-btn"
+            >
+              <v-icon style="margin-bottom: 5px;">{{ fewShotMasks[viewMaskIndex].avatar }}</v-icon>
+            </v-btn>
             <v-text-field
               v-model="fewShotMasks[viewMaskIndex].title"
               density="compact"
               variant="outlined"
             ></v-text-field>
+            <!-- <h3 style="margin: 0 20px 20px 60px;">{{ $t('avatar') }}</h3> -->
             <v-spacer></v-spacer>
           </div>
           <template
@@ -294,7 +303,7 @@ onNuxtReady( () => {
 .icon-custom {
   border: 0.5px solid rgb(128, 128, 128);
   border-radius: 8px;
-  padding: 16px;
+  padding: 14px 16px 20px 16px;
   margin: 5px 5px 0 5px;
 }
 .btn-custom {
@@ -332,5 +341,10 @@ onNuxtReady( () => {
 }
 .textarea-custom {
   flex-grow: 1;
+}
+.avatar-btn {
+  margin: 0 20px 20px 0;
+  height: 40px;
+  width: 40px;
 }
 </style>

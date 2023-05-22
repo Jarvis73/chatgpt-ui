@@ -121,9 +121,9 @@ const drawer = useDrawer()
                 <v-btn v-bind="props" size="small" variant="text" icon="expand_more"></v-btn>
               </template>
               <v-list>
-                <v-list-item :title="$t('resetPassword')" to="/account/resetPassword">
+                <v-list-item prepend-icon="lock_reset" :title="$t('resetPassword')" to="/account/resetPassword">
                 </v-list-item>
-                <v-list-item :title="$t('signOut')" @click="signOut">
+                <v-list-item prepend-icon="logout" :title="$t('signOut')" @click="signOut">
                 </v-list-item>
               </v-list>
             </v-menu>

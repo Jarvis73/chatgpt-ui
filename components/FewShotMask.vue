@@ -1,8 +1,12 @@
 <script setup>
+import EmojiPicker from 'vue3-emoji-picker'
+import 'vue3-emoji-picker/css'
+
 const { $i18n } = useNuxtApp()
 
 const menu = ref(false)
 const grab = ref(null)
+const showEmojiPicker = ref(false)
 const props = defineProps({
   maskTitle: {
     type: Array,
@@ -60,6 +64,7 @@ const saveFewShotMasks = async () => {
     method: 'POST',
     body: {
       title: props.maskTitle[0],
+      avatar: props.maskTitle[1],
       mask: JSON.stringify(props.fewShotMessages)
     }
   })
@@ -79,6 +84,10 @@ const adjustTextAreaHeightWhenBlur = (event, idx) => {
   textarea.rows = 1;
 }
 
+const onSelectEmoji = (emoji) => {
+  props.maskTitle[1] = emoji.i
+  showEmojiPicker.value = false
+}
 </script>
 
 <template>
@@ -109,14 +118,30 @@ const adjustTextAreaHeightWhenBlur = (event, idx) => {
           <v-list class="list-max-height">
             <div 
               v-if="fewShotMessages.length > 0"
-              class="pt-3 pl-6 pr-6 mask-title-custom"
+              class="pt-3 pl-7 pr-6 mask-title-custom"
             >
-              <h3 style="margin: 0 20px 20px 0;">名称</h3>
+              <h3 style="margin: 0 20px 20px 0;">{{ $t('maskTitle') }}</h3>
+              <v-btn 
+                icon 
+                variant="outlined"
+                @click="showEmojiPicker = !showEmojiPicker"
+                class="avatar-btn"
+              >
+                <v-icon style="margin-bottom: 5px;">{{ maskTitle[1] }}</v-icon>
+              </v-btn>
               <v-text-field
                 v-model="maskTitle[0]"
                 density="compact"
                 variant="outlined"
               ></v-text-field>
+              <!-- <h3 style="margin: 0 20px 20px 60px;">{{ $t('avatar') }}</h3> -->
+              <EmojiPicker
+                v-if="showEmojiPicker" 
+                :native="true" 
+                @select="onSelectEmoji"
+                class="emoji-picker-custom"
+                v-on:blur="showEmojiPicker = false"
+              ></EmojiPicker>
               <v-spacer></v-spacer>
             </div>
             <template
@@ -197,7 +222,7 @@ const adjustTextAreaHeightWhenBlur = (event, idx) => {
               @click="saveFewShotMasks()"
             >
               <v-icon icon="save"></v-icon>
-              <span style="padding-left: 2px;">保存</span>
+              <span style="padding-left: 2px;">{{ $t('save') }}</span>
             </v-btn>
             <v-btn
               variant="outlined"
@@ -214,7 +239,7 @@ const adjustTextAreaHeightWhenBlur = (event, idx) => {
               @click="resetFewShotMasks()"
             >
               <v-icon icon="refresh"></v-icon>
-              <span style="padding-left: 2px;">重置</span>
+              <span style="padding-left: 2px;">{{ $t('reset') }}</span>
             </v-btn>
           </div>
         </v-card>
@@ -272,5 +297,16 @@ const adjustTextAreaHeightWhenBlur = (event, idx) => {
 }
 .textarea-custom {
   flex-grow: 1;
+}
+.emoji-picker-custom {
+  position: fixed;
+  z-index: 9999;
+  right: 48%;
+  bottom: 1%;
+}
+.avatar-btn {
+  margin: 0 20px 20px 0;
+  height: 40px;
+  width: 40px;
 }
 </style>

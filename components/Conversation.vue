@@ -190,11 +190,6 @@ const usePrompt = (prompt) => {
   editor.value.usePrompt(prompt)
 }
 
-const useMask = (title, mask) => {
-  maskTitle.value = title
-  fewShotMessages.value = mask
-}
-
 const deleteMessage = (index) => {
   props.conversation.messages.splice(index, 1)
 }
