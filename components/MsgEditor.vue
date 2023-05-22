@@ -177,9 +177,9 @@ defineExpose({
     ></v-textarea>
     <v-btn
         :disabled="loading"
-        icon="send"
+        icon="fa:fa-solid fa-paper-plane"
         title="Send"
-        class="ml-3"
+        class="ml-3 pr-1"
         @click="clickSendBtn"
     ></v-btn>
   </div>

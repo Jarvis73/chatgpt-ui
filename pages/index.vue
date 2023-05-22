@@ -14,9 +14,11 @@ const conversation = ref(getDefaultConversationData())
 const maskStore = ref(false)
 const appBar = ref(true)
 const conversationPanel = ref(true)
+const maskTitle = ref([$i18n.t('newCosplay'), '😀'])
+// const maskTitle = ref($i18n.t('newCosplay'))
+// const maskAvatar = ref('😀')
 const fewShotMessages = ref(getDefaultFewShotMessages())
 const showButtonGroup = ref([])
-const maskTitle = ref([$i18n.t('newCosplay'), '😀'])
 const totalMasks = ref(0)
 
 const openMaskStore = () => {
@@ -53,20 +55,25 @@ const createNewConversation = () => {
   conversation.value = Object.assign(getDefaultConversationData(), {
     topic: $i18n.t('newConversation')
   })
+  // Reset the few shot mask
+  fewShotMessages.value.length = 0
+  showButtonGroup.value.length = 0
 }
 
-const useMask = (title, avator, mask) => {
-  maskTitle.value[0] = title
-  maskTitle.value[1] = avator
-  for (var i = 0; i < mask.length; i ++) {
+const useMask = (data) => {
+  maskTitle.value[0] = data.title
+  maskTitle.value[1] = data.avatar
+  // maskTitle.value = data.title
+  // maskAvatar.value = data.avatar
+  for (var i = 0; i < data.mask.length; i ++) {
     showButtonGroup.value.push(true)
   }
-  fewShotMessages.value = mask
+  fewShotMessages.value = data.mask
   closeMaskStore()
 }
 
-const updateMaskNumber = (value) => {
-  totalMasks.value = value
+const updateMaskNumber = (data) => {
+  totalMasks.value = data
 }
 
 onMounted(async () => {
@@ -77,7 +84,6 @@ onMounted(async () => {
     conversation.value.loadingMessages = false
   }
 })
-
 
 const navTitle = computed(() => {
   if (conversation.value && conversation.value.topic !== null) {
@@ -91,6 +97,11 @@ onActivated(async () => {
     createNewConversation()
   }
 })
+
+const updateAvatar = (data) => {
+  // maskAvatar.value = data
+  maskTitle.value[1] = data
+}
 
 </script>
 
@@ -146,30 +157,28 @@ onActivated(async () => {
 
   </v-app-bar>
 
-  <v-main class="main-custom">
+  <v-main>
     <Welcome v-if="!route.params.id && conversation.messages.length === 0 && !maskStore" />
     <transition name="slide-up">
       <MaskStore 
         v-if="maskStore"
-        :use-mask="useMask"
-        :update-mask-number="updateMaskNumber"
+        @use-mask="useMask"
+        @update-mask-number="updateMaskNumber"
       />
     </transition>
     <Conversation 
       :conversation="conversation"
       :open-mask-store="openMaskStore" 
       :conversation-panel="conversationPanel"
+      :mask-title="maskTitle"
       :few-shot-messages="fewShotMessages"
       :show-button-group="showButtonGroup"
-      :mask-title="maskTitle"
+      @update-avatar="updateAvatar"
     />
   </v-main>
 </template>
 
 <style scoped>
-.main-custom {
-  display: flex;
-}
 .v-subtitle {  
   font-size: 0.8em;
   font-weight: 400;

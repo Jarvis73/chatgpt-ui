@@ -7,16 +7,17 @@ const deleteMaskIndex = ref(null)
 const showViewDialog = ref(false)
 const viewMaskIndex = ref(null)
 const editableMask = ref(false)
-const props = defineProps({
-  useMask: {
-    type: Function,
-    required: true
-  },
-  updateMaskNumber: {
-    type: Function,
-    required: true
-  }
-})
+const emit = defineEmits([
+  'useMask', 'updateMaskNumber'
+])
+
+const setMask = (title, avatar, mask) => {
+  emit('useMask', {title: title, avatar: avatar, mask: mask})
+}
+
+const setMaskNumber = (number) => {
+  emit('updateMaskNumber', number)
+}
 
 const loadFewShotMasks = async () => {
   loadingMasks.value = true
@@ -31,7 +32,7 @@ const loadFewShotMasks = async () => {
       })
     }
   }
-  props.updateMaskNumber(fewShotMasks.value.length)
+  setMaskNumber(fewShotMasks.value.length)
   loadingMasks.value = false
 }
 
@@ -50,7 +51,7 @@ const deleteFewShotMask = async () => {
     if (!error.value) {
       fewShotMasks.value.splice(index, 1)
     }
-    props.updateMaskNumber(fewShotMasks.value.length)
+    setMaskNumber(fewShotMasks.value.length)
   }
   deleteMaskIndex.value = null
   showDeleteDialog.value = false
@@ -100,11 +101,12 @@ onNuxtReady( () => {
                   <v-list-item-subtitle>{{ `${$t('contain')} ${item.mask.length} ${$t('conversation')}` }}</v-list-item-subtitle>
                 </div>
               </div>
+              <v-spacer></v-spacer>
               <div class="right-side-custom">
                 <v-btn 
                   color=""
                   variant="outlined"
-                  @click="useMask(item.title, item.avatar, item.mask)"
+                  @click="setMask(item.title, item.avatar, item.mask)"
                   class="btn-custom"
                 >
                   <v-icon icon="add"></v-icon>

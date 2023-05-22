@@ -12,31 +12,17 @@ let isProcessingQueue = false
 const grab = ref(null)
 
 const props = defineProps({
-  conversation: {
-    type: Object,
-    required: true
-  },
-  openMaskStore: {
-    type: Function,
-    required: true
-  },
-  conversationPanel: {
-    type: Boolean,
-    required: true
-  },
-  fewShotMessages: {
-    type: Array,
-    required: true
-  },
-  maskTitle: {
-    type: Array,
-    required: true
-  },
-  showButtonGroup: {
-    type: Array,
-    required: true
-  }
+  conversation: { type: Object, required: true },
+  openMaskStore: { type: Function, required: true },
+  conversationPanel: { type: Boolean, required: true },
+  maskTitle: { type: Array, required: true },
+  // maskAvatar: { type: String, required: true },
+  fewShotMessages: { type: Array, required: true },
+  showButtonGroup: { type: Array, required: true }
 })
+const emit = defineEmits([
+  'updateAvatar'
+])
 
 const processMessageQueue = () => {
   if (isProcessingQueue || messageQueue.length === 0) {
@@ -85,11 +71,11 @@ const fetchReply = async (message) => {
   const data = Object.assign({}, currentModel.value, {
     openaiApiKey: $settings.open_api_key_setting === 'True' ? openaiApiKey.value : null,
     message: message,
-    fewShotMask: props.fewShotMessages.value,
+    fewShotMask: props.fewShotMessages,
     conversationId: props.conversation.id,
     frugalMode: frugalMode.value
   }, webSearchParams)
-
+  console.log(data)
   try {
     await fetchEventSource('/api/conversation/', {
       signal: ctrl.signal,
@@ -196,6 +182,10 @@ const deleteMessage = (index) => {
 
 const enableWebSearch = ref(false)
 
+const updateAvatar = (data) => {
+  emit('updateAvatar', data)
+}
+
 onNuxtReady(() => {
   currentModel.value = getCurrentModel()
 })
@@ -265,11 +255,12 @@ onNuxtReady(() => {
         <Prompt v-show="!fetchingResponse" :use-prompt="usePrompt" />
         <FewShotMask 
           v-show="!fetchingResponse" 
-          :few-shot-messages="fewShotMessages" 
           :mask-title="maskTitle"
+          :few-shot-messages="fewShotMessages" 
           :show-button-group="showButtonGroup"
+          @update-avatar="updateAvatar"
         />
-        <v-btn icon @click="openMaskStore()" v-show="!fetchingResponse" >
+        <v-btn icon @click="openMaskStore()" v-show="!fetchingResponse" :title="$t('cosplayStore')">
           <v-icon 
             icon="fa:fa-solid fa-store" 
             size="20" 

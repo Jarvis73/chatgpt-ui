@@ -1,8 +1,7 @@
 <script setup>
+
 import EmojiPicker from 'vue3-emoji-picker'
 import 'vue3-emoji-picker/css'
-
-const { $i18n } = useNuxtApp()
 
 const menu = ref(false)
 const grab = ref(null)
@@ -12,6 +11,10 @@ const props = defineProps({
     type: Array,
     required: true
   },
+  // maskAvatar: {
+  //   type: String,
+  //   required: true
+  // },
   fewShotMessages: {
     type: Array,
     required: true
@@ -21,6 +24,9 @@ const props = defineProps({
     required: true
   }
 })
+const emit = defineEmits([
+  'updateAvatar'
+])
 
 const addMessage = () => {
   const fewShotMessage = {
@@ -84,17 +90,18 @@ const adjustTextAreaHeightWhenBlur = (event, idx) => {
   textarea.rows = 1;
 }
 
-const onSelectEmoji = (emoji) => {
-  props.maskTitle[1] = emoji.i
+const setAvatar = (emoji) => {
+  emit('updateAvatar', emoji.i)
   showEmojiPicker.value = false
 }
+
 </script>
 
 <template>
   <div>
     <v-menu v-model="menu" :close-on-content-click="false"> 
       <template v-slot:activator="{ props }">
-        <v-btn v-bind="props" icon>
+        <v-btn v-bind="props" icon :title="$t('presetFewShotMask')">
           <v-icon 
             :icon="fewShotMessages.length === 0 ? 'face' : 'fa:fa-solid fa-mask'"
             style="padding-bottom: 2px;"
@@ -137,10 +144,9 @@ const onSelectEmoji = (emoji) => {
               <!-- <h3 style="margin: 0 20px 20px 60px;">{{ $t('avatar') }}</h3> -->
               <EmojiPicker
                 v-if="showEmojiPicker" 
-                :native="true" 
-                @select="onSelectEmoji"
                 class="emoji-picker-custom"
-                v-on:blur="showEmojiPicker = false"
+                :native="true"
+                @select="setAvatar"
               ></EmojiPicker>
               <v-spacer></v-spacer>
             </div>
