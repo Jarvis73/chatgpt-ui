@@ -85,7 +85,7 @@ const fetchReply = async (message) => {
   const data = Object.assign({}, currentModel.value, {
     openaiApiKey: $settings.open_api_key_setting === 'True' ? openaiApiKey.value : null,
     message: message,
-    fewShotMask: fewShotMessages.value,
+    fewShotMask: props.fewShotMessages.value,
     conversationId: props.conversation.id,
     frugalMode: frugalMode.value
   }, webSearchParams)
