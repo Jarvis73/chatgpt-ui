@@ -15,8 +15,6 @@ const maskStore = ref(false)
 const appBar = ref(true)
 const conversationPanel = ref(true)
 const maskTitle = ref([$i18n.t('newCosplay'), '😀'])
-// const maskTitle = ref($i18n.t('newCosplay'))
-// const maskAvatar = ref('😀')
 const fewShotMessages = ref(getDefaultFewShotMessages())
 const showButtonGroup = ref([])
 const totalMasks = ref(0)
@@ -103,6 +101,11 @@ const updateAvatar = (data) => {
   maskTitle.value[1] = data
 }
 
+const resetTitle = () => {
+  maskTitle.value[0] = $i18n.t('newCosplay')
+  maskTitle.value[1] = '😀'
+}
+
 </script>
 
 <template>
@@ -174,6 +177,7 @@ const updateAvatar = (data) => {
       :few-shot-messages="fewShotMessages"
       :show-button-group="showButtonGroup"
       @update-avatar="updateAvatar"
+      @reset-title="resetTitle"
     />
   </v-main>
 </template>

@@ -11,10 +11,6 @@ const props = defineProps({
     type: Array,
     required: true
   },
-  // maskAvatar: {
-  //   type: String,
-  //   required: true
-  // },
   fewShotMessages: {
     type: Array,
     required: true
@@ -25,7 +21,7 @@ const props = defineProps({
   }
 })
 const emit = defineEmits([
-  'updateAvatar'
+  'updateAvatar', 'resetTitle'
 ])
 
 const addMessage = () => {
@@ -58,6 +54,7 @@ const deleteFewShotMasks = (idx) => {
 const resetFewShotMasks = () => {
   props.showButtonGroup.length = 0
   props.fewShotMessages.length = 0
+  emit('resetTitle')
 }
 
 const submittingNewMask = ref(false)
@@ -122,7 +119,8 @@ const setAvatar = (emoji) => {
 
           <v-divider></v-divider>
 
-          <v-list class="list-max-height">
+          <v-list class="list-max-height" 
+              :disabled="submittingNewMask">
             <div 
               v-if="fewShotMessages.length > 0"
               class="pt-3 pl-7 pr-6 mask-title-custom"
@@ -231,6 +229,7 @@ const setAvatar = (emoji) => {
               <span style="padding-left: 2px;">{{ $t('save') }}</span>
             </v-btn>
             <v-btn
+              :disabled="submittingNewMask"
               variant="outlined"
               @click="addMessage()"
               class="action-btn-custom"
@@ -240,6 +239,7 @@ const setAvatar = (emoji) => {
             </v-btn>
             <v-spacer></v-spacer>
             <v-btn 
+              :disabled="submittingNewMask"
               variant="outlined"
               class="action-btn-custom"
               @click="resetFewShotMasks()"

@@ -110,6 +110,7 @@
   "masksTotal1": "共 ",
   "masksTotal2": " 个面具",
   "avatar": "头像",
+  "close": "关闭",
   "welcomeScreen": {
     "introduction1": "是一个非官方的ChatGPT客户端，但使用OpenAI的官方API",
     "introduction2": "在使用本客户端之前，您需要一个OpenAI API密钥。",

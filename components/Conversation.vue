@@ -21,7 +21,7 @@ const props = defineProps({
   showButtonGroup: { type: Array, required: true }
 })
 const emit = defineEmits([
-  'updateAvatar'
+  'updateAvatar', 'resetTitle'
 ])
 
 const processMessageQueue = () => {
@@ -75,7 +75,6 @@ const fetchReply = async (message) => {
     conversationId: props.conversation.id,
     frugalMode: frugalMode.value
   }, webSearchParams)
-  console.log(data)
   try {
     await fetchEventSource('/api/conversation/', {
       signal: ctrl.signal,
@@ -186,6 +185,10 @@ const updateAvatar = (data) => {
   emit('updateAvatar', data)
 }
 
+const resetTitle = () => {
+  emit('resetTitle')
+}
+
 onNuxtReady(() => {
   currentModel.value = getCurrentModel()
 })
@@ -259,6 +262,7 @@ onNuxtReady(() => {
           :few-shot-messages="fewShotMessages" 
           :show-button-group="showButtonGroup"
           @update-avatar="updateAvatar"
+          @reset-title="resetTitle"
         />
         <v-btn icon @click="openMaskStore()" v-show="!fetchingResponse" :title="$t('cosplayStore')">
           <v-icon 
@@ -340,7 +344,7 @@ onNuxtReady(() => {
           variant="text"
           @click="snackbar = false"
       >
-        Close
+        {{ $t('close') }}
       </v-btn>
     </template>
   </v-snackbar>
