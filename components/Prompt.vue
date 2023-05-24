@@ -130,7 +130,7 @@ onNuxtReady( () => {
                 :key="prompt.id"
             >
               <v-list-item
-                  active-color="primary"
+                  color="primary"
                   v-if="editingPrompt && editingPrompt.id === prompt.id"
               >
                 <div class="d-flex flex-row" :style="{ marginTop: '5px' }">
@@ -176,7 +176,7 @@ onNuxtReady( () => {
               <v-list-item
                   v-if="!editingPrompt || editingPrompt.id !== prompt.id"
                   rounded="xl"
-                  active-color="primary"
+                  color="primary"
                   @click="selectPrompt(prompt)"
               >
                 <v-list-item-title>{{ prompt.title ? prompt.title : prompt.prompt }}</v-list-item-title>
@@ -201,7 +201,7 @@ onNuxtReady( () => {
             </template>
 
             <v-list-item
-                active-color="primary"
+                color="primary"
             >
               <div
                   class="pt-3"
@@ -220,7 +220,7 @@ onNuxtReady( () => {
             </v-list-item>
 
             <v-list-item
-                active-color="primary"
+                color="primary"
             >
               <div
                   class="pt-3"

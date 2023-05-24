@@ -146,7 +146,7 @@ const drawer = useDrawer()
 
       <v-list>
         <template v-for="(conversation, cIdx) in conversations" :key="conversation.id">
-          <v-list-item active-color="primary" rounded="xl"
+          <v-list-item color="primary" rounded="xl"
             v-if="editingConversation && editingConversation.id === conversation.id">
             <v-text-field v-model="editingConversation.topic" :loading="editingConversation.updating" variant="underlined"
               append-icon="done" hide-details density="compact" autofocus @keyup.enter="updateConversation(cIdx)"
@@ -154,7 +154,7 @@ const drawer = useDrawer()
           </v-list-item>
           <v-hover v-if="!editingConversation || editingConversation.id !== conversation.id"
             v-slot="{ isHovering, props }">
-            <v-list-item rounded="xl" active-color="primary" :to="conversation.id ? `/${conversation.id}` : '/'"
+            <v-list-item rounded="xl" color="primary" :to="conversation.id ? `/${conversation.id}` : '/'"
               v-bind="props">
               <v-list-item-title>{{ (conversation.topic && conversation.topic !== '') ? conversation.topic :
                 $t('defaultConversationTitle') }}</v-list-item-title>

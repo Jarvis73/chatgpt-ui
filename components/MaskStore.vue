@@ -11,6 +11,21 @@ const emit = defineEmits([
   'useMask', 'updateMaskNumber'
 ])
 
+const { isMobile } = useDevice();
+const pfs = (() => {
+  if (isMobile) {
+        return { 
+          l: 'phone-large-font',
+          n: 'phone-font', 
+          s: 'phone-small-font', 
+          t: 'phone-tiny-font',
+          btnCustom: 'btn-custom-phone',
+          pd: 'pd-phone',
+        }
+    } 
+    return { l: '', n: '', s: '', t: '', btnCustom: 'btn-custom', ph: '' }
+})()
+
 const setMask = (title, avatar, mask) => {
   emit('useMask', {title: title, avatar: avatar, mask: mask})
 }
@@ -85,59 +100,60 @@ onNuxtReady( () => {
 </script>
 
 <template>
-  <v-container class="container">
-    <div class="list-custom">
-      <v-list>
-        <template
-          v-for="(item, idx) in fewShotMasks"
-          :key="item.id"
-        >
-          <v-list-item class="list-item-custom">
-            <div class="list-item-content-custom">
-              <div class="left-side-custom">
-                <v-icon class="icon-custom">{{ item.avatar }}</v-icon>
-                <div>
-                  <v-list-item-title>{{ item.title }}</v-list-item-title>
-                  <v-list-item-subtitle>{{ `${$t('contain')} ${item.mask.length} ${$t('conversation')}` }}</v-list-item-subtitle>
-                </div>
-              </div>
-              <v-spacer></v-spacer>
-              <div class="right-side-custom">
-                <v-btn 
-                  color=""
-                  variant="outlined"
-                  @click="setMask(item.title, item.avatar, item.mask)"
-                  class="btn-custom"
-                >
-                  <v-icon icon="add"></v-icon>
-                  <span class="pl-1">{{ $t('use') }}</span>
-                </v-btn>
-                <v-btn 
-                  color=""
-                  variant="outlined"
-                  class="btn-custom"
-                  @click="onViewMask(idx)"
-                >
-                  <v-icon icon="remove_red_eye"></v-icon>
-                  <span class="pl-1">{{ $t('view') }}</span>
-                </v-btn>
-                <v-btn 
-                  color=""
-                  variant="outlined"
-                  class="btn-custom"
-                  @click="onDeleteMask(idx)"
-                >
-                  <v-icon icon="delete"></v-icon>
-                  <span class="pl-1">{{ $t('delete') }}</span>
-                </v-btn>
+  <v-container fluid class="container">
+    <!-- <div class="list-custom"> -->
+    <v-list class="list-custom">
+      <template
+        v-for="(item, idx) in fewShotMasks"
+        :key="item.id"
+      >
+        <v-list-item class="list-item-custom">
+          <div class="list-item-content-custom" :class="pfs.pd">
+            <div class="left-side-custom">
+              <v-icon class="icon-custom" :class="pfs.l">{{ item.avatar }}</v-icon>
+              <div>
+                <v-list-item-title :class="pfs.n">{{ item.title }}</v-list-item-title>
+                <v-list-item-subtitle :class="pfs.s">{{ `${$t('contain')} ${item.mask.length} ${$t('conversation')}` }}</v-list-item-subtitle>
               </div>
             </div>
-          </v-list-item>
-        </template>
-      </v-list>
-    </div>
+            <div class="right-side-custom">
+              <v-btn 
+                :icon="isMobile"
+                color=""
+                variant="outlined"
+                @click="setMask(item.title, item.avatar, item.mask)"
+                :class="pfs.btnCustom"
+              >
+                <v-icon icon="add"></v-icon>
+                <span v-show="!isMobile">{{ $t('use') }}</span>
+              </v-btn>
+              <v-btn 
+                :icon="isMobile"
+                color=""
+                variant="outlined"
+                @click="onViewMask(idx)"
+                :class="pfs.btnCustom"
+              >
+                <v-icon icon="remove_red_eye"></v-icon>
+                <span v-show="!isMobile">{{ $t('view') }}</span>
+              </v-btn>
+              <v-btn 
+                :icon="isMobile"
+                color=""
+                variant="outlined"
+                @click="onDeleteMask(idx)"
+                :class="pfs.btnCustom"
+              >
+                <v-icon icon="delete"></v-icon>
+                <span v-show="!isMobile">{{ $t('delete') }}</span>
+              </v-btn>
+            </div>
+          </div>
+        </v-list-item>
+      </template>
+    </v-list>
+    <!-- </div> -->
 
-    <!-- Confirm Delete Dialog -->
     <v-dialog v-model="showDeleteDialog" max-width="500px">
       <v-card>
         <v-card-title class="headline">{{ $t('Confirm deletion') }}</v-card-title>
@@ -163,7 +179,6 @@ onNuxtReady( () => {
       </v-card>
     </v-dialog>
 
-    <!-- View Dialog -->
     <v-dialog v-model="showViewDialog" max-width="800px">
       <v-card 
         min-width="800" 
@@ -191,7 +206,6 @@ onNuxtReady( () => {
               density="compact"
               variant="outlined"
             ></v-text-field>
-            <!-- <h3 style="margin: 0 20px 20px 60px;">{{ $t('avatar') }}</h3> -->
             <v-spacer></v-spacer>
           </div>
           <template
@@ -267,33 +281,31 @@ onNuxtReady( () => {
 
 <style scoped>
 .container {
+  flex-grow: 1;
   padding: 0;
-  margin: 0;
-  position: relative;
-  left: 0;
-  right: 0;
+  display: flex;
 }
 .list-custom {
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow-y: auto;
+  flex-grow: 1;
 }
 .list-item-custom {
-  padding: 16px 16px !important;
-  border: 0.5px solid rgb(128, 128, 128);
-  margin: 0 20px;
+  margin: 0;
+  padding: 0;
 }
 .list-item-content-custom {
+  border: 0.5px solid rgb(128, 128, 128);
+  padding: 16px !important;
   display: flex;
   justify-content: space-between;
+  margin: 0 auto;
+  min-width: 500px;
+  max-width: 1000px;
 }
-.list-item-custom:first-child {
+.list-item-custom:first-child .list-item-content-custom {
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
 }
-.list-item-custom:last-child {
+.list-item-custom:last-child .list-item-content-custom {
   border-bottom-left-radius: 15px;
   border-bottom-right-radius: 15px;
 }
@@ -348,5 +360,16 @@ onNuxtReady( () => {
   margin: 0 20px 20px 0;
   height: 40px;
   width: 40px;
+}
+
+/* Phone */
+.btn-custom-phone {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.pd-phone {
+  min-width: 300px;
+  padding: 8px !important;
 }
 </style>

@@ -20,6 +20,7 @@ export default defineNuxtConfig({
         transpile: ['vuetify']
     },
     css: [
+        '@/css/main.css',
         'vuetify/styles',
         'material-design-icons-iconfont/dist/material-design-icons.css',
         'highlight.js/styles/panda-syntax-dark.css',
@@ -28,7 +29,8 @@ export default defineNuxtConfig({
     modules: [
         '@kevinmarrec/nuxt-pwa',
         '@nuxtjs/color-mode',
-        '@nuxtjs/i18n'
+        '@nuxtjs/i18n',
+        '@nuxtjs/device'
     ],
     pwa: {
         manifest: {
