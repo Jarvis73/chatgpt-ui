@@ -1,5 +1,5 @@
 <template>
-  <ColorScheme placeholder="..." tag="span">
+  <ColorScheme placeholder="loading..." tag="span">
     <v-app
         :theme="$colorMode.value"
     >

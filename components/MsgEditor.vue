@@ -52,7 +52,7 @@ onMounted(async () => {
   // 清除样本文本
   message.value = '';
 
-  console.log('Initial height:', initialHeight, 'Height per line:', heightPerLine);
+  // console.log('Initial height:', initialHeight, 'Height per line:', heightPerLine);
 });
 
 watch(message,() => {
@@ -129,25 +129,16 @@ const enterOnly = (event) => {
   }
   else {
     // 手机上回车只做换行操作
-    const textarea = event.target;
+    const textarea = textArea.value;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const value = textarea.value;
     message.value = `${value.substring(0, start)}\n${value.substring(end)}`;
-    textarea.selectionStart = start + 1;
-    textarea.selectionEnd = start + 1;
+    // 使用 nextTick, 等待 watch message 执行了再定位光标
+    nextTick(() => {
+      textarea.setSelectionRange(start + 1, start + 1)
+    })
   }
-}
-
-const controlEnter = (event) => {
-  event.preventDefault();
-  const textarea = event.target;
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const value = textarea.value;
-  message.value = `${value.substring(0, start)}\n${value.substring(end)}`;
-  textarea.selectionStart = start + 1;
-  textarea.selectionEnd = start + 1;
 }
 
 defineExpose({
@@ -173,7 +164,6 @@ defineExpose({
         clearable
         variant="outlined"
         @keydown.enter.exact="enterOnly"
-        @keydown.enter.ctrl.exact="controlEnter"
     ></v-textarea>
     <v-btn
         :disabled="loading"

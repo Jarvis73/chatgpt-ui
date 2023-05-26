@@ -222,7 +222,7 @@ const drawer = useDrawer()
                       </template>
                     </v-list-item>
                   </template>
-                  <v-list bg-color="white">
+                  <v-list>
                     <v-list-item v-for="(theme, idx) in themes" :key="idx" @click="setTheme(theme.value)">
                       <v-list-item-title>{{ theme.title }}</v-list-item-title>
                     </v-list-item>

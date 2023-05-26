@@ -1,4 +1,6 @@
 <script setup>
+import { mergeProps } from 'vue';
+
 const menu = ref(false)
 const prompts = ref([])
 const editingPrompt = ref(null)
@@ -97,15 +99,19 @@ onNuxtReady( () => {
         v-model="menu"
         :close-on-content-click="false"
     >
-      <template v-slot:activator="{ props }">
-        <v-btn
-            v-bind="props"
-            icon
-        >
-          <v-icon
-              icon="speaker_notes"
-          ></v-icon>
-        </v-btn>
+      <template v-slot:activator="{ props: menu }">
+        <v-tooltip location="top" :text="$t('prompt')">
+          <template v-slot:activator="{ props: tooltip }">
+            <v-btn
+              v-bind="mergeProps(menu, tooltip)"
+              icon
+            >
+              <v-icon
+                icon="speaker_notes"
+              ></v-icon>
+            </v-btn>
+          </template>
+        </v-tooltip>
       </template>
 
       <v-container>

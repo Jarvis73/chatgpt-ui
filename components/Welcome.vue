@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="container">
     <v-row>
       <v-col cols="12">
         <div class="text-center">
@@ -81,3 +81,9 @@ const limitations = ref([
   $i18n.t('welcomeScreen.limitations.item3')
 ])
 </script>
+
+<style scoped>
+.container {
+  min-width: 300px;
+}
+</style>

@@ -27,6 +27,7 @@
   "saveAndClose": "Save & Close",
   "pleaseSelectAtLeastOneModelDot": "Please select at least one model.",
   "writeAMessage": "Write a message",
+  "prompt": "Prompts",
   "frequentlyPrompts": "Frequently prompts",
   "addPrompt": "Add prompt",
   "titlePrompt": "Title",

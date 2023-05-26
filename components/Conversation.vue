@@ -1,7 +1,9 @@
 <script setup>
+import { mergeProps } from 'vue';
 import {EventStreamContentType, fetchEventSource} from '@microsoft/fetch-event-source'
 
 const { $i18n, $settings } = useNuxtApp()
+const route = useRoute()
 const runtimeConfig = useRuntimeConfig()
 const currentModel = useCurrentModel()
 const openaiApiKey = useApiKey()
@@ -196,7 +198,7 @@ onNuxtReady(() => {
 </script>
 
 <template>
-  <div v-show="props.conversationPanel">
+  <div v-show="props.conversationPanel" class="container">
   <div v-if="conversation">
     <div
         v-if="conversation.loadingMessages"
@@ -209,7 +211,7 @@ onNuxtReady(() => {
     </div>
     <div v-else>
       <div
-          v-if="conversation.messages"
+          v-if="conversation.messages.length > 0"
           ref="chatWindow"
       >
         <v-container>
@@ -244,6 +246,9 @@ onNuxtReady(() => {
 
         <div ref="grab" class="w-100" style="height: 200px;"></div>
       </div>
+      <div v-else>
+        <Welcome v-if="!route.params.id && conversation.messages.length === 0" />
+      </div>
     </div>
   </div>
   </div>
@@ -264,13 +269,17 @@ onNuxtReady(() => {
           @update-avatar="updateAvatar"
           @reset-title="resetTitle"
         />
-        <v-btn icon @click="openMaskStore()" v-show="!fetchingResponse" :title="$t('cosplayStore')">
-          <v-icon 
-            icon="fa:fa-solid fa-store" 
-            size="20" 
-            style="padding-bottom: 2px;"
-          />
-        </v-btn>
+        <v-tooltip location="top" :text="$t('cosplayStore')">
+          <template v-slot:activator="{props}">
+            <v-btn v-bind="props" icon @click="openMaskStore()" v-show="!fetchingResponse" :title="$t('cosplayStore')">
+              <v-icon 
+                icon="fa:fa-solid fa-store" 
+                size="20" 
+                style="padding-bottom: 2px;"
+              />
+            </v-btn>
+          </template>
+        </v-tooltip>
         <v-switch
             v-if="$settings.open_web_search === 'True'"
             v-model="enableWebSearch"
@@ -318,7 +327,7 @@ onNuxtReady(() => {
         </div>
 
       </v-toolbar>
-      <div class="d-flex align-center">
+      <div class="d-flex align-center pb-md-2">
         <v-btn
             v-show="fetchingResponse"
             icon="close"
@@ -352,11 +361,6 @@ onNuxtReady(() => {
 
 <style scoped>
 .container {
-  padding: 0;
-  margin: 0;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  flex-grow: 1;
 }
 </style>

@@ -1,5 +1,6 @@
 <script setup>
 
+import { mergeProps } from 'vue';
 import EmojiPicker from 'vue3-emoji-picker'
 import 'vue3-emoji-picker/css'
 
@@ -23,6 +24,21 @@ const props = defineProps({
 const emit = defineEmits([
   'updateAvatar', 'resetTitle'
 ])
+
+const { isMobile } = useDevice();
+const pfs = (() => {
+  if (isMobile) {
+        return { 
+          l: 'phone-large-font',
+          n: 'phone-font', 
+          s: 'phone-small-font', 
+          t: 'phone-tiny-font',
+          offset: '8 64',
+        }
+    }
+    return { l: '', n: '', s: '', t: '', offset: '16 0' }
+})()
+
 
 const addMessage = () => {
   const fewShotMessage = {
@@ -97,24 +113,24 @@ const setAvatar = (emoji) => {
 <template>
   <div>
     <v-menu v-model="menu" :close-on-content-click="false"> 
-      <template v-slot:activator="{ props }">
-        <v-btn v-bind="props" icon :title="$t('presetFewShotMask')">
-          <v-icon 
-            :icon="fewShotMessages.length === 0 ? 'face' : 'fa:fa-solid fa-mask'"
-            style="padding-bottom: 2px;"
-            fade
-          ></v-icon>
-        </v-btn>
+      <template v-slot:activator="{ props: menu }">
+        <v-tooltip location="top" :text="$t('presetFewShotMask')">
+          <template v-slot:activator="{ props: tooltip }">
+            <v-btn v-bind="mergeProps(menu, tooltip)" icon :title="$t('presetFewShotMask')">
+              <v-icon 
+                :icon="fewShotMessages.length === 0 ? 'face' : 'fa:fa-solid fa-mask'"
+                style="padding-bottom: 2px;"
+                fade
+              ></v-icon>
+            </v-btn>
+          </template>
+        </v-tooltip>
       </template>
 
-      <v-container>
-        <v-card 
-            min-width="800" 
-            max-width="800"
-            class="card-custom"
-          >
+      <v-container class="card-size card-custom">
+        <v-card>
           <v-card-title>
-            <span class="headline">{{ $t('presetFewShotMask') }}</span>
+            <span class="headline" :class="pfs.l">{{ $t('presetFewShotMask') }}</span>
           </v-card-title>
 
           <v-divider></v-divider>
@@ -123,23 +139,22 @@ const setAvatar = (emoji) => {
               :disabled="submittingNewMask">
             <div 
               v-if="fewShotMessages.length > 0"
-              class="pt-3 pl-7 pr-6 mask-title-custom"
+              class="pt-3 ml-1 mask-title-custom pd-custom"
             >
-              <h3 style="margin: 0 20px 20px 0;">{{ $t('maskTitle') }}</h3>
+              <h3 style="margin: 0 10px 20px 0;" :class="pfs.n">{{ $t('maskTitle') }}</h3>
               <v-btn 
                 icon 
                 variant="outlined"
                 @click="showEmojiPicker = !showEmojiPicker"
                 class="avatar-btn"
               >
-                <v-icon style="margin-bottom: 5px;">{{ maskTitle[1] }}</v-icon>
+                <v-icon style="margin-bottom: 5px;" :class="pfs.l">{{ maskTitle[1] }}</v-icon>
               </v-btn>
               <v-text-field
                 v-model="maskTitle[0]"
                 density="compact"
                 variant="outlined"
               ></v-text-field>
-              <!-- <h3 style="margin: 0 20px 20px 60px;">{{ $t('avatar') }}</h3> -->
               <EmojiPicker
                 v-if="showEmojiPicker" 
                 class="emoji-picker-custom"
@@ -152,41 +167,40 @@ const setAvatar = (emoji) => {
               v-for="(fewShotMessage, idx) in fewShotMessages"
               :key="fewShotMessage.id"
             >
-              <div class="pt-3 pl-6 pr-6 list-item-custom">
-                <v-btn-group 
+              <div class="pt-3 list-item-custom pd-custom">
+                <v-btn 
+                  icon 
+                  title="system" 
+                  class="square"
+                  elevation="0"
                   v-if="showButtonGroup[idx]"
-                  v-model="fewShotMessage.role"
-                  density="compact"
-                  class="btn-group"
-                > 
-                  <v-btn 
-                    icon 
-                    title="system" 
-                    @click="fewShotMessage.role='system'" 
-                    class="square"
-                    :color="fewShotMessage.role == 'system' ? 'primary' : ''"
-                  >
-                    <v-icon icon="settings" size="24"></v-icon>
-                  </v-btn>
-                  <v-btn 
-                    icon 
-                    title="user" 
-                    @click="fewShotMessage.role='user'"
-                    class="square"
-                    :color="fewShotMessage.role === 'user' ? 'primary' : ''"
-                  >
-                    <v-icon icon="person" size="24"></v-icon>
-                  </v-btn>
-                  <v-btn 
-                    icon 
-                    title="assistant" 
-                    @click="fewShotMessage.role='assistant'"  
-                    class="square"
-                    :color="fewShotMessage.role === 'assistant' ? 'primary' : ''"
-                  >
-                    <v-icon icon="smart_toy" size="24"></v-icon>
-                  </v-btn>
-                </v-btn-group> 
+                  @click="fewShotMessage.role='system'" 
+                  :color="fewShotMessage.role == 'system' ? 'primary' : ''"
+                >
+                  <v-icon icon="settings" size="24"></v-icon>
+                </v-btn>
+                <v-btn 
+                  icon 
+                  title="user" 
+                  class="square"
+                  elevation="0"
+                  v-if="showButtonGroup[idx]"
+                  @click="fewShotMessage.role='user'"
+                  :color="fewShotMessage.role === 'user' ? 'primary' : ''"
+                >
+                  <v-icon icon="person" size="24"></v-icon>
+                </v-btn>
+                <v-btn 
+                  icon 
+                  title="assistant" 
+                  class="square"
+                  elevation="0"
+                  v-if="showButtonGroup[idx]"
+                  @click="fewShotMessage.role='assistant'"  
+                  :color="fewShotMessage.role === 'assistant' ? 'primary' : ''"
+                >
+                  <v-icon icon="smart_toy" size="24"></v-icon>
+                </v-btn>
 
                 <v-textarea 
                   rows="1"
@@ -255,7 +269,56 @@ const setAvatar = (emoji) => {
 </template>
 
 <style scoped>
+@media screen and (min-width: 851px) {
+  .card-size {
+    width: 800px;
+  }
+  .pd-custom {
+    padding: 0 24px 0 24px;
+  }
+}
+@media screen and (max-width: 850px) {
+  .card-size {
+    width: 500px;
+  }
+  .pd-custom {
+    padding: 0 16px 0 16px;
+  }
+}
+@media screen and (min-width: 501px) {
+  .square {
+    height: 36px;
+    width: 36px;
+    margin: 0 2px;
+    border-radius: 5px !important;
+  }
+  .avatar-btn {
+    margin: 0 20px 20px 0;
+    height: 40px;
+    width: 40px;
+  }
+}
+@media screen and (max-width: 500px) {
+  .card-size {
+    width: auto;
+  }
+  .pd-custom {
+    padding: 0 4px 0 12px;
+  }
+  .square {
+    height: 32px;
+    width: 32px;
+    margin: 0 1px;
+    border-radius: 5px !important;
+  }
+  .avatar-btn {
+    margin: 0 20px 20px 0;
+    height: 35px;
+    width: 35px;
+  }
+}
 .card-custom {
+  padding: 0;
   display: flex;
   flex-direction: column;
 }
@@ -267,26 +330,6 @@ const setAvatar = (emoji) => {
 .mask-title-custom {
   display: flex;
   align-items: center;
-}
-.square {
-  /* height: 100% !important;  
-  border-radius: 5px !important; */
-  padding: 5px;
-  margin: 0 5px;
-  border-radius: 5px !important;
-}
-.btn-group {
-  /* padding: 0 9px;
-  margin-bottom: -15px;
-  border-radius: 0 !important; */
-  padding: 0 10px 0 0px;
-  border-radius: 0 !important;
-  display: flex;
-  align-items: center;
-}
-.bottom-button {
-  margin: 5px !important;
-  min-height: 40px;
 }
 .action-custom {
   display: flex;
@@ -303,16 +346,12 @@ const setAvatar = (emoji) => {
 }
 .textarea-custom {
   flex-grow: 1;
+  margin: 0 5px 0 10px;
 }
 .emoji-picker-custom {
   position: fixed;
   z-index: 9999;
   right: 48%;
   bottom: 1%;
-}
-.avatar-btn {
-  margin: 0 20px 20px 0;
-  height: 40px;
-  width: 40px;
 }
 </style>

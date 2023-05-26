@@ -175,7 +175,6 @@ const resetTitle = () => {
   </v-app-bar>
 
   <v-main class="d-flex">
-    <Welcome v-if="!route.params.id && conversation.messages.length === 0 && !maskStore" />
     <transition name="slide-up">
       <MaskStore 
         v-if="maskStore"

@@ -21,9 +21,10 @@ const pfs = (() => {
           t: 'phone-tiny-font',
           btnCustom: 'btn-custom-phone',
           pd: 'pd-phone',
+          offset: '0 64',
         }
     } 
-    return { l: '', n: '', s: '', t: '', btnCustom: 'btn-custom', ph: '' }
+    return { l: '', n: '', s: '', t: '', btnCustom: 'btn-custom', ph: '', offset: '' }
 })()
 
 const setMask = (title, avatar, mask) => {
@@ -101,7 +102,6 @@ onNuxtReady( () => {
 
 <template>
   <v-container fluid class="container">
-    <!-- <div class="list-custom"> -->
     <v-list class="list-custom">
       <template
         v-for="(item, idx) in fewShotMasks"
@@ -152,7 +152,6 @@ onNuxtReady( () => {
         </v-list-item>
       </template>
     </v-list>
-    <!-- </div> -->
 
     <v-dialog v-model="showDeleteDialog" max-width="500px">
       <v-card>
@@ -179,11 +178,9 @@ onNuxtReady( () => {
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="showViewDialog" max-width="800px">
+    <v-dialog v-model="showViewDialog" max-width="800px" width="auto">
       <v-card 
-        min-width="800" 
-        max-width="800"
-        class="card-custom"
+        class="card-size card-custom"
       >
         <v-card-title>
           <span class="headline">{{ $t('viewCosplay') }}</span>
@@ -192,7 +189,7 @@ onNuxtReady( () => {
         <v-divider></v-divider>
 
         <v-list class="list-max-height">
-          <div class="pt-3 pl-7 pr-6 mask-title-custom">
+          <div class="pt-3 ml-1 mask-title-custom pd-custom">
             <h3 style="margin: 0 20px 20px 0;">{{ $t('maskTitle') }}</h3>
             <v-btn 
               icon 
@@ -212,38 +209,37 @@ onNuxtReady( () => {
             v-for="(maskItem, idx) in fewShotMasks[viewMaskIndex].mask"
             :key="maskItem.id"
           >
-            <div class="pt-3 pl-6 pr-6 list-item-view-custom">
-              <v-btn-group 
+            <div class="pt-3 sub-list-item-custom pd-custom">
+              <v-btn 
+                icon
+                title="system" 
+                class="square"
+                elevation="0"
                 v-if="showButtonGroup[idx]"
-                v-model="maskItem.role"
-                density="compact"
-                class="btn-group"
-              > 
-                <v-btn 
-                  icon
-                  title="system" 
-                  class="square"
-                  :color="maskItem.role == 'system' ? 'primary' : ''"
-                >
-                  <v-icon icon="settings" size="24"></v-icon>
-                </v-btn>
-                <v-btn 
-                  icon 
-                  title="user" 
-                  class="square"
-                  :color="maskItem.role === 'user' ? 'primary' : ''"
-                >
-                  <v-icon icon="person" size="24"></v-icon>
-                </v-btn>
-                <v-btn 
-                  icon 
-                  title="assistant" 
-                  class="square"
-                  :color="maskItem.role === 'assistant' ? 'primary' : ''"
-                >
-                  <v-icon icon="smart_toy" size="24"></v-icon>
-                </v-btn>
-              </v-btn-group> 
+                :color="maskItem.role == 'system' ? 'primary' : ''"
+              >
+                <v-icon icon="settings" size="24"></v-icon>
+              </v-btn>
+              <v-btn 
+                icon 
+                title="user" 
+                class="square"
+                elevation="0"
+                v-if="showButtonGroup[idx]"
+                :color="maskItem.role === 'user' ? 'primary' : ''"
+              >
+                <v-icon icon="person" size="24"></v-icon>
+              </v-btn>
+              <v-btn 
+                icon 
+                title="assistant" 
+                class="square"
+                elevation="0"
+                v-if="showButtonGroup[idx]"
+                :color="maskItem.role === 'assistant' ? 'primary' : ''"
+              >
+                <v-icon icon="smart_toy" size="24"></v-icon>
+              </v-btn>
 
               <v-textarea 
                 rows="1"
@@ -325,11 +321,12 @@ onNuxtReady( () => {
   margin: 0 5px;
 }
 .card-custom {
+  padding: 0;
   display: flex;
   flex-direction: column;
 }
 .list-max-height {
-  max-height: 500px;
+  max-height: 400px;
   overflow: auto;
   padding: 0 0 5px 0;
 }
@@ -337,29 +334,14 @@ onNuxtReady( () => {
   display: flex;
   align-items: center;
 }
-.square {
-  padding: 5px;
-  margin: 0 5px;
-  border-radius: 5px !important;
-}
-.btn-group {
-  padding: 0 10px 0 0px;
-  border-radius: 0 !important;
-  display: flex;
-  align-items: center;
-}
-.list-item-view-custom {
+.sub-list-item-custom {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 .textarea-custom {
   flex-grow: 1;
-}
-.avatar-btn {
-  margin: 0 20px 20px 0;
-  height: 40px;
-  width: 40px;
+  margin: 0 5px 0 10px;
 }
 
 /* Phone */
@@ -371,5 +353,53 @@ onNuxtReady( () => {
 .pd-phone {
   min-width: 300px;
   padding: 8px !important;
+}
+@media screen and (min-width: 851px) {
+  .card-size {
+    width: 800px;
+  }
+  .pd-custom {
+    padding: 0 24px 0 24px;
+  }
+}
+@media screen and (max-width: 850px) {
+  .card-size {
+    width: 500px;
+  }
+  .pd-custom {
+    padding: 0 16px 0 16px;
+  }
+}
+@media screen and (min-width: 501px) {
+  .square {
+    height: 36px;
+    width: 36px;
+    margin: 0 2px;
+    border-radius: 5px !important;
+  }
+  .avatar-btn {
+    margin: 0 20px 20px 0;
+    height: 40px;
+    width: 40px;
+  }
+}
+@media screen and (max-width: 500px) {
+  .card-size {
+    width: auto;
+  }
+  .pd-custom {
+    padding: 0 4px 0 12px;
+  }
+  .square {
+    height: 32px;
+    width: 32px;
+    margin: 0 1px;
+    border-radius: 5px !important;
+  }
+  .avatar-btn {
+    margin: 0 20px 20px 0;
+    height: 35px;
+    width: 35px;
+  }
 }
 </style>
