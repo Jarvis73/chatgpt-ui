@@ -58,6 +58,8 @@
   "copy": "Copy",
   "copied": "Copied",
   "delete": "Delete",
+  "deleted": "Deleted",
+  "deleteFailed": "Delete failed",
   "signOut": "Sign out",
   "resetPassword": "Reset password",
   "submit": "Submit",

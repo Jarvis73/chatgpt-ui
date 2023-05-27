@@ -4,7 +4,8 @@ import MarkdownIt from 'markdown-it'
 import copy from 'copy-to-clipboard'
 import mathjax3 from 'markdown-it-mathjax3'
 
-
+const { $i18n } = useNuxtApp()
+const { isMobile } = useDevice();
 const md = new MarkdownIt({
   linkify: true,
   highlight(code, lang) {
@@ -18,18 +19,80 @@ const props = defineProps({
   message: {
     type: Object,
     required: true
+  },
+  messageIndex: {
+    type: Number,
+    required: true
+  },
+  usePrompt: {
+    type: Function,
+    required: true
+  },
+  deleteMessage: {
+    type: Function,
+    required: true
   }
 })
 
+const snackbar = ref(false)
+const snackbarText = ref('')
 const contentHtml = ref('')
-
+const container = ref(null)
 const contentElm = ref(null)
+const hoverStyle = ref({
+  opacity: 0
+})
+
+const showSnackbar = (text) => {
+  snackbarText.value = text
+  snackbar.value = true
+}
+
+const copyMessage = () => {
+  copy(props.message.message)
+  showSnackbar($i18n.t('copied') + '!')
+}
+
+const editMessage = () => {
+  props.usePrompt(props.message.message)
+}
+
+const deleteMessage = async () => {
+  const { data, error } = await useAuthFetch(`/api/chat/messages/${props.message.id}/`, {
+    method: 'DELETE'
+  })
+  if (!error.value) {
+    props.deleteMessage(props.messageIndex)
+    showSnackbar($i18n.t('deleted') + '!')
+  }
+  showSnackbar($i18n.t('deleteFailed') + '!')
+}
 
 watchEffect(async () => {
   contentHtml.value = props.message.message ? md.render(props.message.message.replaceAll('\n', '  \n')) : ''
   await nextTick()
   bindCopyCodeToButtons()
 })
+
+watchEffect(() => {
+  if (container.value !== null && contentElm.value !== null) {
+    const contentElmWidth = contentElm.value.clientWidth
+    let alignItems = ''
+    if (!props.message.is_bot) {
+      alignItems = contentElmWidth > 104 ? 'flex-start' : 'flex-end'
+    } else {
+      alignItems = contentElmWidth > 104 ? 'flex-end' : 'flex-start'
+    }
+    container.value.style.alignItems = alignItems
+  }
+})
+
+const onClickContent = (event) => {
+  hoverStyle.value.opacity = 1
+  setTimeout(() => {
+    hoverStyle.value.opacity = 0
+  }, 1500)
+}
 
 const bindCopyCodeToButtons = () => {
   if (!contentElm.value) {
@@ -59,22 +122,85 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-card
+  <div
+    ref="container"
+    class="chat-message-container"
+  >
+    <div
+      class="chat-message-top-actions"
+      :style="isMobile ? hoverStyle : ''"
+    >
+      <div class="chat-message-top-action" @click="deleteMessage">
+        {{ $i18n.t('delete') }}
+      </div>
+      <div class="chat-message-top-action mr-2" @click="editMessage">
+        {{ $i18n.t('edit') }}
+      </div>
+      <div class="chat-message-top-action mr-2" @click="copyMessage">
+        {{ $i18n.t('copy') }}
+      </div>
+    </div>
+    <v-card
       :color="message.is_bot ? '' : 'primary'"
       rounded="lg"
       elevation="2"
-  >
-    <div
+    >
+      <div
+        v-if="isMobile"
         ref="contentElm"
         v-html="contentHtml"
         class="chat-msg-content pa-3"
-    ></div>
-  </v-card>
+        @click="onClickContent"
+      ></div>
+      <div
+        v-else
+        ref="contentElm"
+        v-html="contentHtml"
+        class="chat-msg-content pa-3"
+      ></div>
+    </v-card>
+
+    <v-snackbar
+      v-model="snackbar"
+      location="top"
+      timeout="2000"
+    >
+      {{ snackbarText }}
+    </v-snackbar>
+  </div>
 </template>
 
 <style>
+.chat-message-container {
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    .chat-message-top-actions {
+      opacity: 1;
+    }
+  }
+}
+.chat-message-top-actions {
+  font-size: 0.875rem;
+  transition: all ease 0.3s;
+  opacity: 0;
+
+  display: flex;
+  flex-direction: row-reverse;
+
+  .chat-message-top-action {
+    opacity: 0.5;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
 .chat-msg-content {
-  font-size: 0.875rem !important;
+  font-size: 1rem !important;
   font-weight: 400;
   line-height: 1.25rem;
   /* 气泡底部不要出现空白行, 抵消 p 的 1rem */
