@@ -59,14 +59,33 @@ const editMessage = () => {
 }
 
 const deleteMessage = async () => {
-  const { data, error } = await useAuthFetch(`/api/chat/messages/${props.message.id}/`, {
-    method: 'DELETE'
-  })
-  if (!error.value) {
+  // 成对删除 user + assistant 的消息
+
+  // 如何当前 message 有 id
+  if (props.message.id !== null && typeof props.message.id !== 'undefined') {
+    const { data, error } = await useAuthFetch(`/api/chat/messages/${props.message.id}/`, {
+      method: 'DELETE'
+    })
+    if (!error.value) {
+      props.deleteMessage(props.messageIndex)
+      showSnackbar($i18n.t('deleted') + '!')
+    } else {
+      showSnackbar($i18n.t('deleteFailed') + '!')
+    }
+  } 
+  else // 直接在本地删除当前 message, 还未存入数据库 
+  {
     props.deleteMessage(props.messageIndex)
+    // console.log(!props.message.is_bot)
+    // if (!props.message.is_bot) {
+    //     props.deleteMessage(props.messageIndex + 1)
+    //     props.deleteMessage(props.messageIndex)
+    // } else {
+    //   props.deleteMessage(props.messageIndex)
+    //   props.deleteMessage(props.messageIndex - 1)
+    // }
     showSnackbar($i18n.t('deleted') + '!')
   }
-  showSnackbar($i18n.t('deleteFailed') + '!')
 }
 
 watchEffect(async () => {
@@ -76,17 +95,17 @@ watchEffect(async () => {
 })
 
 watchEffect( () => {
-    if (container.value !== null && contentElm.value !== null) {
-      const contentElmWidth = contentElm.value.clientWidth
-      let align = ''
-      let alignItems = ''
-      if (!props.message.is_bot) {
-        alignItems = contentElmWidth > 121 ? 'flex-start' : 'flex-end'
-      } else {
-        alignItems = contentElmWidth > 121 ? 'flex-end' : 'flex-start'
-      }
-      container.value.style.alignItems = alignItems
+  if (container.value !== null && contentElm.value !== null) {
+    const contentElmWidth = contentElm.value.clientWidth
+    // console.log(contentElmWidth, contentElm)
+    let alignItems = ''
+    if (!props.message.is_bot) {
+      alignItems = contentElmWidth > 130 ? 'flex-start' : 'flex-end'
+    } else {
+      alignItems = contentElmWidth > 130 ? 'flex-end' : 'flex-start'
     }
+    container.value.style.alignItems = alignItems
+  }
 })
 
 const onClickContent = (event) => {

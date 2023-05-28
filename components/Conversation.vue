@@ -235,7 +235,7 @@ onNuxtReady(() => {
           </v-row>
         </v-container>
 
-        <div ref="grab" class="w-100" style="height: 200px;"></div>
+        <div ref="grab" class="w-100" style="height: 50px;"></div>
       </div>
       <div v-else>
         <Welcome v-if="!route.params.id && conversation.messages.length === 0" />
