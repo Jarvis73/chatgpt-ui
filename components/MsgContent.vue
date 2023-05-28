@@ -39,6 +39,7 @@ const snackbarText = ref('')
 const contentHtml = ref('')
 const container = ref(null)
 const contentElm = ref(null)
+const actionDiv = ref(null)
 const hoverStyle = ref({
   opacity: 0
 })
@@ -74,23 +75,26 @@ watchEffect(async () => {
   bindCopyCodeToButtons()
 })
 
-watchEffect(() => {
-  if (container.value !== null && contentElm.value !== null) {
-    const contentElmWidth = contentElm.value.clientWidth
-    let alignItems = ''
-    if (!props.message.is_bot) {
-      alignItems = contentElmWidth > 104 ? 'flex-start' : 'flex-end'
-    } else {
-      alignItems = contentElmWidth > 104 ? 'flex-end' : 'flex-start'
+watchEffect( () => {
+    if (container.value !== null && contentElm.value !== null) {
+      const contentElmWidth = contentElm.value.clientWidth
+      let align = ''
+      let alignItems = ''
+      if (!props.message.is_bot) {
+        alignItems = contentElmWidth > 121 ? 'flex-start' : 'flex-end'
+      } else {
+        alignItems = contentElmWidth > 121 ? 'flex-end' : 'flex-start'
+      }
+      container.value.style.alignItems = alignItems
     }
-    container.value.style.alignItems = alignItems
-  }
 })
 
 const onClickContent = (event) => {
   hoverStyle.value.opacity = 1
+  hoverStyle.value.left = '5px'
   setTimeout(() => {
     hoverStyle.value.opacity = 0
+    hoverStyle.value.left = '15px'
   }, 1500)
 }
 
@@ -178,13 +182,19 @@ onMounted(() => {
   &:hover {
     .chat-message-top-actions {
       opacity: 1;
+      left: 5px;
+      pointer-events: all;
     }
   }
 }
 .chat-message-top-actions {
   font-size: 0.875rem;
+  position: relative;
+  margin: 0 10px 3px 0;
+  left: 15px;
   transition: all ease 0.3s;
   opacity: 0;
+  pointer-events: none;
 
   display: flex;
   flex-direction: row-reverse;

@@ -4,7 +4,12 @@ export const getDefaultConversationData = () => {
     return {
         id: null,
         topic: null,
-        messages: [],
+        messages: [
+            {message: '我是你的小可爱我是你的小可爱我我是你我是你的小可爱我是你的小可爱我是你的小可爱我是你的小可爱的小可爱我是你的小可爱我是你的小可爱我是你的小可爱是你的小可爱我是你的小可爱'},
+            {id: null, is_bot: true, message: '你当然是我的我是你的小可爱我是你的小可爱我是你的小可爱我是你的小可爱小可爱啦你当然是我的小可爱啦我是你的小可爱我是你的小可爱'},
+            {message: '小可爱'},
+            {id: null, is_bot: true, message: '小可爱啦'},
+        ],
         loadingMessages: false,
     }
 }
