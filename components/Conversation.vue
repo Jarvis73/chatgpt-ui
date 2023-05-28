@@ -228,7 +228,7 @@ onNuxtReady(() => {
                     :message-index="index"
                     :use-prompt="usePrompt"
                     :delete-message="deleteMessage"
-                    :style="`max-width: ${isMobile ? '90%' : '80%'};`"
+                    :style="`flex-basis: ${isMobile ? '90%' : '80%'}; flex-grow: 0;`"
                 />
               </div>
             </v-col>

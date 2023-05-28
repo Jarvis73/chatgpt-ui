@@ -41,7 +41,9 @@ const container = ref(null)
 const contentElm = ref(null)
 const actionDiv = ref(null)
 const hoverStyle = ref({
-  opacity: 0
+  opacity: 0,
+  left: '15px',
+  pointerEvents: 'none'
 })
 
 const showSnackbar = (text) => {
@@ -94,27 +96,15 @@ watchEffect(async () => {
   bindCopyCodeToButtons()
 })
 
-watchEffect( () => {
-  if (container.value !== null && contentElm.value !== null) {
-    const contentElmWidth = contentElm.value.clientWidth
-    // console.log(contentElmWidth, contentElm)
-    let alignItems = ''
-    if (!props.message.is_bot) {
-      alignItems = contentElmWidth > 130 ? 'flex-start' : 'flex-end'
-    } else {
-      alignItems = contentElmWidth > 130 ? 'flex-end' : 'flex-start'
-    }
-    container.value.style.alignItems = alignItems
-  }
-})
-
 const onClickContent = (event) => {
   hoverStyle.value.opacity = 1
   hoverStyle.value.left = '5px'
+  hoverStyle.value.pointerEvents = 'all'
   setTimeout(() => {
     hoverStyle.value.opacity = 0
     hoverStyle.value.left = '15px'
-  }, 1500)
+    hoverStyle.value.pointerEvents = 'none'
+  }, 2000)
 }
 
 const bindCopyCodeToButtons = () => {
@@ -148,6 +138,7 @@ onMounted(() => {
   <div
     ref="container"
     class="chat-message-container"
+    :style="`align-items: flex-${message.is_bot ? 'start' : 'end'};`"
   >
     <div
       class="chat-message-top-actions"
@@ -167,12 +158,14 @@ onMounted(() => {
       :color="message.is_bot ? '' : 'primary'"
       rounded="lg"
       elevation="2"
+      :style="isMobile ? `max-width: 330px;` : ''"
     >
       <div
         v-if="isMobile"
         ref="contentElm"
         v-html="contentHtml"
         class="chat-msg-content pa-3"
+        style="font-size: 0.875rem !important;"
         @click="onClickContent"
       ></div>
       <div
@@ -229,7 +222,6 @@ onMounted(() => {
   }
 }
 .chat-msg-content {
-  font-size: 1rem !important;
   font-weight: 400;
   line-height: 1.25rem;
   /* 气泡底部不要出现空白行, 抵消 p 的 1rem */
