@@ -102,6 +102,7 @@ onNuxtReady(() => {
                             {{ item }}
                             <span v-if="item === 'gpt-3.5-turbo-16k'" class="badge">VIP</span>
                             <span v-if="item === 'gpt-4'" class="badge">VIP</span>
+                            <span v-if="item === 'gpt-4-turbo'" class="badge">VIP</span>
                         </v-list-item-title>
                     </v-list-item>
                 </v-list>

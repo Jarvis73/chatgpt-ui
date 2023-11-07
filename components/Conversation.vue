@@ -314,7 +314,7 @@ onNuxtReady(() => {
 })
 const bgColor = computed(() => {
     // return currentModel.value.name === 'gpt-4' ? 'rgb(27,27,27)' : 'rgb(25, 195, 125)';
-    return currentModel.value.name === 'gpt-4' ? 'rgb(56, 35, 91)' : 'rgb(170,144,212)'
+    return currentModel.value.name.includes('gpt-4') ? 'rgb(56, 35, 91)' : 'rgb(170,144,212)'
 })
 </script>
 
