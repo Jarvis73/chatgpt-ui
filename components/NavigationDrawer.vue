@@ -90,7 +90,7 @@ const groupedConversations = computed(() => {
 })
 
 const open = computed(() => {
-    return Object.keys(groupedConversations.value)
+    return Object.keys(groupedConversations.value).slice(0, 1)
 })
 
 const editingConversation = ref(null)
@@ -433,6 +433,8 @@ const drawer = useDrawer()
                                         </v-list-item>
                                     </v-list>
                                 </v-menu>
+
+                                <QuotaDialog />
 
                                 <SettingsLanguages />
 
