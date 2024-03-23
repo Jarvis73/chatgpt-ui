@@ -36,12 +36,22 @@ const setLang = (lang) => {
 
 const conversations = useConversations()
 const defaultAppend = (obj, key, value) => {
-    if (!obj[key]) {
-        obj[key] = []
+    if (!obj.id2key) {
+        obj.id2key = {}
     }
-    obj[key].push(value)
+    if (!obj.key2group) {
+        // key to group of conversations
+        obj.key2group = {}
+    }
+    if (!obj.key2group[key]) {
+        obj.key2group[key] = []
+    }
+    obj.key2group[key].push(value)
+    obj.id2key[value.id] = key
 }
-const groupedConversations = computed(() => {
+
+const groupedConversations = useGroupedConversations()
+groupedConversations.value = computed(() => {
     conversations.value.sort((a, b) => b.updated_at.localeCompare(a.updated_at))
     const now = new Date()
     return conversations.value.reduce((result, item) => {
@@ -90,7 +100,7 @@ const groupedConversations = computed(() => {
 })
 
 const open = computed(() => {
-    return Object.keys(groupedConversations.value).slice(0, 1)
+    return [`${$i18n.t('today')}`]
 })
 
 const editingConversation = ref(null)
@@ -233,7 +243,7 @@ const drawer = useDrawer()
             </v-list>
 
             <v-list :opened="open">
-                <template v-for="(items, date) in groupedConversations" :key="date">
+                <template v-for="(items, date) in groupedConversations.key2group" :key="date">
                     <v-list-group :value="date">
                         <template v-slot:activator="{ props }">
                             <v-list-item

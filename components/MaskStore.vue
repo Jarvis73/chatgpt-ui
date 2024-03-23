@@ -159,7 +159,7 @@ const updateFewShotMask = async (index) => {
     }
     // Check if no changes
     let previous = fewShotMasks.value[index]
-    console.log(item, previous)
+    // console.log(item, previous)
     if (
         item.title === previous.title &&
         item.avatar === previous.avatar &&

@@ -66,7 +66,9 @@ const loadMessage = async () => {
         '/api/chat/messages/?conversationId=' + route.params.id
     )
     if (!error.value) {
-        conversation.value.id = route.params.id
+        // route.params.id is a string, so we need to convert it to a number
+        // to match the conversation id
+        conversation.value.id = parseInt(route.params.id)
         conversation.value.messages = data.value
     }
 }
