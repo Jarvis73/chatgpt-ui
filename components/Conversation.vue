@@ -230,7 +230,7 @@ const send = (message) => {
     props.conversation.messages.push({ message: message })
     const now = new Date().toISOString()
     Object.assign(props.conversation, { updated_at: now })
-    moveUpdatedConversationToTop(props.conversation.id)
+    updateConversationToNow(props.conversation.id, now)
     scrollChatWindow()
     fetchReply(message)
     scrollChatWindow()

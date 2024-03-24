@@ -36,13 +36,6 @@ const setLang = (lang) => {
 
 const conversations = useConversations()
 const defaultAppend = (obj, key, value) => {
-    if (!obj.id2key) {
-        obj.id2key = {}
-    }
-    if (!obj.key2group) {
-        // key to group of conversations
-        obj.key2group = {}
-    }
     if (!obj.key2group[key]) {
         obj.key2group[key] = []
     }
@@ -50,53 +43,52 @@ const defaultAppend = (obj, key, value) => {
     obj.id2key[value.id] = key
 }
 
-const groupedConversations = useGroupedConversations()
-groupedConversations.value = computed(() => {
-    conversations.value.sort((a, b) => b.updated_at.localeCompare(a.updated_at))
-    const now = new Date()
-    return conversations.value.reduce((result, item) => {
-        const itemDate = new Date(Date.parse(item.updated_at))
-        if (
-            itemDate.getFullYear() === now.getFullYear() &&
-            itemDate.getMonth() === now.getMonth()
-        ) {
-            // 今天
-            const today = now.getDate()
-            switch (itemDate.getDate()) {
-                case today:
-                    defaultAppend(result, `${$i18n.t('today')}`, item)
-                    break
-                case today - 1:
-                    defaultAppend(result, `${$i18n.t('yesterday')}`, item)
-                    break
-                case today - 2:
-                case today - 3:
-                case today - 4:
-                case today - 5:
-                case today - 6:
-                    defaultAppend(result, `${$i18n.t('sevendays')}`, item)
-                    break
-                default:
-                    defaultAppend(
-                        result,
-                        `${$i18n.t('monthTip1')}${$i18n.t(`month.${itemDate.getMonth()}`)}${$i18n.t(
-                            'monthTip2'
-                        )}`,
-                        item
-                    )
-                    break
-            }
-        } else {
-            defaultAppend(
-                result,
-                `${itemDate.getFullYear()}${$i18n.t('yearTip')}${$i18n.t(
-                    `month.${itemDate.getMonth()}`
-                )} ${$i18n.t('yearTip') === '' ? itemDate.getFullYear() : ''}`,
-                item
-            )
+const calcGroupKey = (now, item) => {
+    const itemDate = new Date(Date.parse(item.updated_at))
+    if (
+        itemDate.getFullYear() === now.getFullYear() &&
+        itemDate.getMonth() === now.getMonth()
+    ) {
+        // 今天
+        const today = now.getDate()
+        switch (itemDate.getDate()) {
+            case today:
+                return `${$i18n.t('today')}`
+            case today - 1:
+                return `${$i18n.t('yesterday')}`
+            case today - 2:
+            case today - 3:
+            case today - 4:
+            case today - 5:
+            case today - 6:
+                return `${$i18n.t('sevendays')}`
+            default:
+                return `${$i18n.t('monthTip1')}${$i18n.t(`month.${itemDate.getMonth()}`)}${$i18n.t(
+                    'monthTip2'
+                )}`
         }
-        return result
-    }, {})
+    } else {
+        return `${itemDate.getFullYear()}${$i18n.t('yearTip')}${$i18n.t(
+            `month.${itemDate.getMonth()}`
+        )} ${$i18n.t('yearTip') === '' ? itemDate.getFullYear() : ''}`
+    }
+}
+
+const groupedConversations = computed(() => {
+    let newConversations = [...conversations.value]
+    newConversations.sort((a, b) => b.updated_at.localeCompare(a.updated_at))
+    
+    const now = new Date()
+    let result = {}
+    newConversations.forEach((item) => {
+        const itemDate = new Date(Date.parse(item.updated_at))
+        const key = calcGroupKey(now, item)
+        if (!result[key]) {
+            result[key] = []
+        }
+        result[key].push(item)
+    })
+    return result
 })
 
 const open = computed(() => {
@@ -242,8 +234,8 @@ const drawer = useDrawer()
                 </v-list-item>
             </v-list>
 
-            <v-list :opened="open">
-                <template v-for="(items, date) in groupedConversations.key2group" :key="date">
+            <v-list :opened="open" open-strategy="multiple">
+                <template v-for="(items, date) in groupedConversations" :key="date">
                     <v-list-group :value="date">
                         <template v-slot:activator="{ props }">
                             <v-list-item
