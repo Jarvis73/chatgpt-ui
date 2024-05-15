@@ -46,7 +46,7 @@ export const MODELS = {
         frequency_penalty: 0.0,
         presence_penalty: 0.0,
         total_tokens: 32096,
-        max_tokens: 8192,
+        max_tokens: 4096,
         temperature: 1.0,
         top_p: 0.8
     },
