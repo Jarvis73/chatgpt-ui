@@ -4,7 +4,7 @@ import { mergeProps } from 'vue'
 const openaiApiKey = useApiKey()
 const dialog = ref(false)
 const currentModel = useCurrentModel()
-const reactiveCurrentModel = reactive({ name: 'gpt-3.5-turbo' })
+const reactiveCurrentModel = reactive({ name: 'deepseek-chat' })
 const availableModels = Object.keys(MODELS)
 const currentModelDefault = ref(MODELS[currentModel.value.name])
 const compactMode = ref(true)
@@ -100,9 +100,9 @@ onNuxtReady(() => {
                     >
                         <v-list-item-title>
                             {{ item }}
-                            <span v-if="item === 'gpt-3.5-turbo-16k'" class="badge">VIP</span>
-                            <span v-if="item === 'gpt-4'" class="badge">VIP</span>
                             <span v-if="item === 'gpt-4-turbo'" class="badge">VIP</span>
+                            <span v-if="item === 'gpt-4o'" class="badge">VIP</span>
+                            <span v-if="item === 'gpt-4'" class="badge">VIP</span>
                         </v-list-item-title>
                     </v-list-item>
                 </v-list>
